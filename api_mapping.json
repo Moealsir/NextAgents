@@ -1,0 +1,44 @@
+[
+    {
+        "file": "blog.js",
+        "old_call": "supabaseClient.from('blog_posts').select('*').eq('published', true).order('created_at', { ascending: false }).limit(100)",
+        "new_call": "fetch('/api/blogs').then(res => res.json())",
+        "purpose": "Fetch all published blog posts"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').select('*').order('created_at', { ascending: false }).limit(100)",
+        "new_call": "fetch('/api/admin/blogs').then(res => res.json())",
+        "purpose": "Fetch all blog posts for admin view"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').select('*', { count: 'exact', head: true })",
+        "new_call": "fetch('/api/blog-count').then(res => res.json()).then(data => data.count)",
+        "purpose": "Count all blog posts for dashboard badge"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').update(data).eq('id', editingBlogId).select()",
+        "new_call": "fetch(`/api/admin/blogs/${editingBlogId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.json())",
+        "purpose": "Update an existing blog post"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').insert([data]).select()",
+        "new_call": "fetch('/api/admin/blogs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.json())",
+        "purpose": "Insert a new blog post"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').select('*').eq('id', blogId).single()",
+        "new_call": "fetch(`/api/blogs/${blogId}`).then(res => res.json())",
+        "purpose": "Fetch a single blog post for editing"
+    },
+    {
+        "file": "admin.js",
+        "old_call": "supabaseClient.from('blog_posts').delete().eq('id', blogId)",
+        "new_call": "fetch(`/api/admin/blogs/${blogId}`, { method: 'DELETE' })",
+        "purpose": "Delete a blog post"
+    }
+]
