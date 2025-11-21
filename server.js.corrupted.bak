@@ -1,0 +1,671 @@
+const express = require('express');
+const { Pool } = require('pg');
+const cors = require('cors');
+
+// IMPORTANT: The DATABASE_URL is hardcoded here for demonstration.
+// In a production environment, you MUST use environment variables (e.g., process.env.DATABASE_URL).
+const DATABASE_URL = "postgres://nextagents:AiAgents123@143.110.226.0:5432/nextdb";
+
+const pool = new Pool({
+    connectionString: DATABASE_URL,
+});
+
+const app = express();
+const port = 3010; // Using 3010 as per user's last successful run
+
+// Middleware
+app.use(cors()); // Allow frontend to access the API
+app.use(express.json()); // To parse JSON request bodies
+
+// Serve static files from the 'frontend' directory
+app.use(express.static('frontend'));
+
+// --- API Endpoints ---
+
+// #region Blog Posts CRUD
+
+// Fetch all published blog posts (for blog.html)
+app.get('/api/blogs', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM blog_posts WHERE published = TRUE ORDER BY created_at DESC LIMIT 100');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching blogs:', err);
+        res.status(500).json({ error: 'Failed to fetch blog posts' });
+    }
+});
+
+// Fetch a single blog post by ID (for post.html)
+app.get('/api/blogs/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM blog_posts WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(`Error fetching single blog [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to fetch blog post' });
+    }
+});
+
+// Fetch all blog posts (for admin dashboard)
+app.get('/api/admin/blogs', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM blog_posts ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching admin blogs:', err);
+        res.status(500).json({ error: 'Failed to fetch admin blog posts' });
+    }
+});
+
+// Create a new blog post
+app.post('/api/admin/blogs', async (req, res) => {
+    const { title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published } = req.body;
+    try {
+        const result = await pool.query(
+            `INSERT INTO blog_posts (title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+            [title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Error creating blog post:', err);
+        res.status(500).json({ error: 'Failed to create blog post' });
+    }
+});
+
+// Update a blog post
+app.put('/api/admin/blogs/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published } = req.body;
+    try {
+        const result = await pool.query(
+            `UPDATE blog_posts SET 
+                title_ar = $1, title_en = $2, excerpt_ar = $3, excerpt_en = $4, content_ar = $5, content_en = $6, 
+                slug = $7, category = $8, author = $9, image_url = $10, tags = $11, published = $12, updated_at = NOW() 
+             WHERE id = $13 RETURNING *`,
+            [title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(`Error updating blog post [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to update blog post' });
+    }
+});
+
+// Delete a blog post
+app.delete('/api/admin/blogs/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM blog_posts WHERE id = $1 RETURNING id', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+        res.status(204).send();
+    } catch (err) {
+        console.error(`Error deleting blog post [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to delete blog post' });
+    }
+});
+
+// #endregion
+
+// #region Products CRUD
+
+// Fetch all products
+app.get('/api/products', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).json({ error: 'Failed to fetch products' });
+    }
+});
+
+// Create a new product
+app.post('/api/products', async (req, res) => {
+    const { title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url } = req.body;
+    try {
+        const result = await pool.query(
+            `INSERT INTO products (title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Error creating product:', err);
+        res.status(500).json({ error: 'Failed to create product' });
+    }
+});
+
+// Update a product
+app.put('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url } = req.body;
+    try {
+        const result = await pool.query(
+            `UPDATE products SET 
+                title_ar = $1, title_en = $2, description_ar = $3, description_en = $4, 
+                icon = $5, file_type = $6, file_size = $7, download_url = $8 
+             WHERE id = $9 RETURNING *`,
+            [title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(`Error updating product [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to update product' });
+    }
+});
+
+// Delete a product
+app.delete('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING id', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.status(204).send();
+    } catch (err) {
+        console.error(`Error deleting product [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to delete product' });
+    }
+});
+
+// #endregion
+
+// #region Testimonials CRUD
+
+// Fetch all testimonials
+app.get('/api/testimonials', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM testimonials ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching testimonials:', err);
+        res.status(500).json({ error: 'Failed to fetch testimonials' });
+    }
+});
+
+// Create a new testimonial
+app.post('/api/testimonials', async (req, res) => {
+    const { name_ar, name_en, company_ar, company_en, testimonial_ar, testimonial_en, rating, avatar } = req.body;
+    try {
+        const result = await pool.query(
+            `INSERT INTO testimonials (name_ar, name_en, company_ar, company_en, testimonial_ar, testimonial_en, rating, avatar) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [name_ar, name_en, company_ar, company_en, testimonial_ar, testimonial_en, rating, avatar]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Error creating testimonial:', err);
+        res.status(500).json({ error: 'Failed to create testimonial' });
+    }
+});
+
+// Update a testimonial
+app.put('/api/testimonials/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name_ar, name_en, company_ar, company_en, testimonial_ar, testimonial_en, rating, avatar } = req.body;
+    try {
+        const result = await pool.query(
+            `UPDATE testimonials SET 
+                name_ar = $1, name_en = $2, company_ar = $3, company_en = $4, 
+                testimonial_ar = $5, testimonial_en = $6, rating = $7, avatar = $8 
+             WHERE id = $9 RETURNING *`,
+            [name_ar, name_en, company_ar, company_en, testimonial_ar, testimonial_en, rating, avatar, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Testimonial not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(`Error updating testimonial [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to update testimonial' });
+    }
+});
+
+// Delete a testimonial
+app.delete('/api/testimonials/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM testimonials WHERE id = $1 RETURNING id', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Testimonial not found' });
+        }
+        res.status(204).send();
+    } catch (err) {
+        console.error(`Error deleting testimonial [${id}]:`, err);
+        res.status(500).json({ error: 'Failed to delete testimonial' });
+    }
+});
+
+// #endregion
+
+// #region Count Endpoints
+
+// Count all blog posts
+app.get('/api/blog-count', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT COUNT(*) FROM blog_posts');
+        res.json({ count: parseInt(result.rows[0].count, 10) });
+    } catch (err) {
+        console.error('Error counting blogs:', err);
+        res.status(500).json({ error: 'Failed to count blog posts' });
+    }
+});
+
+// Count all products
+app.get('/api/product-count', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT COUNT(*) FROM products');
+        res.json({ count: parseInt(result.rows[0].count, 10) });
+    } catch (err) {
+        console.error('Error counting products:', err);
+        res.status(500).json({ error: 'Failed to count products' });
+    }
+});
+
+// Count all testimonials
+app.get('/api/testimonial-count', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT COUNT(*) FROM testimonials');
+        res.json({ count: parseInt(result.rows[0].count, 10) });
+    } catch (err) {
+        console.error('Error counting testimonials:', err);
+        res.status(500).json({ error: 'Failed to count testimonials' });
+    }
+});
+
+// #endregion
+
+// #region Database Seeding
+
+// Load blog content from external JSON file
+const fs = require('fs');
+const path = require('path');
+const blogContentPath = path.join(__dirname, 'blog-content.json');
+let blogContent = { posts: [] };
+try {
+    const blogData = fs.readFileSync(blogContentPath, 'utf8');
+    blogContent = JSON.parse(blogData);
+} catch (err) {
+    console.error('Error loading blog content:', err);
+}
+
+// Seed initial data for products and blog posts
+async function seedDatabase() {
+    const client = await pool.connect();
+    try {
+        console.log('Updating database with seed data...');
+        
+        const products = [
+                {
+                    title_en: 'Automation Starter Guide for Small Businesses',
+                    title_ar: 'دليل الأتمتة للمنشآت الصغيرة والمتوسطة',
+                    description_en: 'A practical step-by-step guide that helps clinics, beauty centers, and service offices map their current operations, choose the right processes to automate, and avoid the most common automation mistakes.',
+                    description_ar: 'دليل عملي خطوة بخطوة يساعد العيادات، مراكز التجميل، ومكاتب الخدمات على رسم عملياتهم الحالية، اختيار ما يجب أتمتته أولاً، وتجنب أخطاء الأتمتة الشائعة.',
+                    icon: 'fas fa-robot',
+                    file_type: 'PDF',
+                    file_size: '2.5 MB',
+                    download_url: '/downloads/automation-starter-guide.pdf'
+                },
+                {
+                    title_en: 'AI WhatsApp Conversation Flows for Clinics',
+                    title_ar: 'قوالب محادثات واتساب ذكية للعيادات الطبية',
+                    description_en: 'Ready-made WhatsApp conversation flows that handle appointment booking, reminders, follow-ups, and basic FAQs for medical clinics and healthcare centers.',
+                    description_ar: 'قوالب جاهزة لمحادثات واتساب تدير حجز المواعيد، التذكير، المتابعة، والرد على الأسئلة المتكررة للعيادات والمراكز الطبية.',
+                    icon: 'fas fa-comments',
+                    file_type: 'DOCX',
+                    file_size: '500 KB',
+                    download_url: '/downloads/ai-whatsapp-flows-clinics.docx'
+                },
+                {
+                    title_en: 'AI & Automation Business Plan Template',
+                    title_ar: 'قالب خطة عمل لمشاريع الأتمتة والذكاء الاصطناعي',
+                    description_en: 'A structured business plan template tailored for agencies, consultants, and automation studios that want to pitch AI and automation solutions to SMEs.',
+                    description_ar: 'قالب منظم لخطة عمل مخصص لوكالات التسويق، المستشارين، واستديوهات الأتمتة لعرض حلول الذكاء الاصطناعي والأتمتة للمنشآت الصغيرة والمتوسطة.',
+                    icon: 'fas fa-lightbulb',
+                    file_type: 'DOCX',
+                    file_size: '600 KB',
+                    download_url: '/downloads/ai-business-plan-template.docx'
+                },
+                {
+                    title_en: 'n8n Workflow Pack for Service Businesses',
+                    title_ar: 'حزمة Workflows n8n جاهزة للمنشآت الخدمية',
+                    description_en: 'A collection of ready-to-use n8n workflows for appointment reminders, lead capture, CRM sync, and email notifications — designed for clinics, salons, and consulting offices.',
+                    description_ar: 'مجموعة من مسارات العمل الجاهزة في n8n لتذكير المواعيد، التقاط العملاء المحتملين، مزامنة الـ CRM، وإرسال الإشعارات البريدية – مخصصة للعيادات، صالونات التجميل، ومكاتب الاستشارات.',
+                    icon: 'fas fa-network-wired',
+                    file_type: 'JSON',
+                    file_size: '850 KB',
+                    download_url: '/downloads/n8n-service-workflow-pack.json'
+                },
+                {
+                    title_en: 'KPI & Automation Dashboard Template',
+                    title_ar: 'قالب لوحة مؤشرات للأتمتة وقياس الأداء',
+                    description_en: 'A Google Sheets / Excel-ready dashboard template to track bookings, response times, automation savings, and campaign performance in one place.',
+                    description_ar: 'قالب لوحة مؤشرات جاهز للاستخدام في Google Sheets أو Excel لقياس الحجوزات، أوقات الرد، وقت العمل الذي تم توفيره بواسطة الأتمتة، وأداء الحملات في مكان واحد.',
+                    icon: 'fas fa-chart-line',
+                    file_type: 'XLSX',
+                    file_size: '350 KB',
+                    download_url: '/downloads/kpi-automation-dashboard.xlsx'
+                }
+            ];
+
+        for (const product of products) {
+            // Check if product exists by title
+            const existing = await client.query(
+                'SELECT id FROM products WHERE title_en = $1',
+                [product.title_en]
+            );
+            
+            if (existing.rows.length > 0) {
+                // Update existing product
+                await client.query(
+                    `UPDATE products SET 
+                        title_ar = $1, description_ar = $2, description_en = $3, 
+                        icon = $4, file_type = $5, file_size = $6, download_url = $7
+                     WHERE title_en = $8`,
+                    [product.title_ar, product.description_ar, product.description_en, 
+                     product.icon, product.file_type, product.file_size, product.download_url, product.title_en]
+                );
+            } else {
+                // Insert new product
+                await client.query(
+                    `INSERT INTO products (title_ar, title_en, description_ar, description_en, icon, file_type, file_size, download_url) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                    [product.title_ar, product.title_en, product.description_ar, product.description_en, 
+                     product.icon, product.file_type, product.file_size, product.download_url]
+                );
+            }
+        }
+        console.log(`✅ Successfully updated ${products.length} products`);
+
+        // Load blog posts from external JSON file
+        const blogPosts = blogContent.posts.map(post => ({
+            title_en: post.title_en,
+            title_ar: post.title_ar,
+            excerpt_en: post.excerpt_en,
+            excerpt_ar: post.excerpt_ar,
+            content_en: post.content_en,
+            content_ar: post.content_ar,
+            slug: post.slug,
+            category: post.category,
+            author: post.author,
+            image_url: post.image_url,
+            tags: `{${post.tags.join(',')}}`,
+            published: post.published
+        }));
+
+        // Use blog posts from JSON file (fallback to empty if not available)
+        const finalBlogPosts = blogPosts.length > 0 ? blogPosts : [];
+
+        // If no posts loaded, log warning
+        if (finalBlogPosts.length === 0) {
+            console.warn('⚠️  No blog posts loaded from blog-content.json');
+        }
+
+        for (const post of finalBlogPosts) {
+            // Check if blog post exists by slug
+            const existing = await client.query(
+                'SELECT id FROM blog_posts WHERE slug = $1',
+                [post.slug]
+            );
+            
+            if (existing.rows.length > 0) {
+                // Update existing post
+                await client.query(
+                    `UPDATE blog_posts SET 
+                        title_ar = $1, title_en = $2, excerpt_ar = $3, excerpt_en = $4,
+                        content_ar = $5, content_en = $6, category = $7, author = $8,
+                        image_url = $9, tags = $10, published = $11, updated_at = CURRENT_TIMESTAMP
+                     WHERE slug = $12`,
+                    [post.title_ar, post.title_en, post.excerpt_ar, post.excerpt_en,
+                     post.content_ar, post.content_en, post.category, post.author,
+                     post.image_url, post.tags, post.published, post.slug]
+                );
+            } else {
+                // Insert new post
+                await client.query(
+                    `INSERT INTO blog_posts (title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+                    [post.title_ar, post.title_en, post.excerpt_ar, post.excerpt_en,
+                     post.content_ar, post.content_en, post.slug, post.category, post.author,
+                     post.image_url, post.tags, post.published]
+                );
+            }
+        }
+        console.log(`✅ Successfully updated ${finalBlogPosts.length} blog posts`);
+
+        client.release();
+    } catch (err) {
+        console.error('Error seeding database:', err);
+    }
+}
+
+// Start seeding when server starts
+seedDatabase();
+
+// #endregion
+
+// #region API Routes
+
+// Get all products
+app.get('/api/products', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM products ORDER BY id');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get all published blog posts
+app.get('/api/blogs', async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM blog_posts WHERE published = true ORDER BY created_at DESC'
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get single blog post by ID
+app.get('/api/blogs/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query(
+            'SELECT * FROM blog_posts WHERE id = $1',
+            [id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+        
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Admin endpoint to manually trigger seeding
+app.post('/api/admin/seed-database', async (req, res) => {
+    try {
+        await seedDatabase();
+        res.json({ message: 'Database seeded successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error seeding database' });
+    }
+});
+
+// #endregion
+
+// Start the server
+const PORT = process.env.PORT || 3010;
+app.listen(PORT, () => {
+    console.log(`✨ Server running on http://localhost:${PORT}`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use. Please close the other instance or use a different port.`);
+        process.exit(1);
+    }
+    throw err;
+});// OLD CONTENT TO DELETE START using AI-powered appointment assistants, automated WhatsApp reminders, and smart scheduling systems. A complete guide with real metrics and implementation steps.',
+                    excerpt_ar: 'اكتشف كيف تخفض العيادات الطبية نسبة عدم الحضور بمعدل 40٪ باستخدام مساعدي المواعيد بالذكاء الاصطناعي، تذكيرات واتساب الذكية، وأنظمة الجدولة التلقائية. دليل شامل مع أرقام حقيقية وخطوات التطبيق.',
+                    content_en: '<h2>The Hidden Cost of No-Shows</h2>\n<p>Patient no-shows cost medical clinics thousands of dollars every month. When a patient misses an appointment without notice, the clinic loses revenue, wastes staff time, and delays care for other patients who could have used that slot.</p>\n<p><strong>Average no-show rates:</strong></p>\n<ul>\n  <li>General practice clinics: 15-25%</li>\n  <li>Specialist clinics: 20-30%</li>\n  <li>Dental clinics: 10-20%</li>\n</ul>\n\n<h2>Why Traditional Reminder Systems Fail</h2>\n<p>Most clinics rely on manual phone calls or basic SMS reminders. These methods have serious limitations:</p>\n<ul>\n  <li><strong>Staff workload:</strong> Calling 50+ patients daily takes 3-4 hours</li>\n  <li><strong>Timing issues:</strong> Patients receive reminders at inconvenient times</li>\n  <li><strong>No conversation:</strong> One-way messages don\'t allow rescheduling</li>\n  <li><strong>Language barriers:</strong> Staff may struggle with non-native speakers</li>\n  <li><strong>No tracking:</strong> No clear data on who confirmed and who didn\'t</li>\n</ul>\n\n<h2>How AI Appointment Assistants Work</h2>\n<p>An AI agent combines language understanding with automated workflows to manage the entire appointment lifecycle:</p>\n\n<h3>Step 1: Smart Reminder Scheduling</h3>\n<p>The system automatically sends reminders at optimal times:</p>\n<ul>\n  <li>7 days before: Initial confirmation request</li>\n  <li>48 hours before: Second reminder with easy reschedule option</li>\n  <li>24 hours before: Final confirmation</li>\n  <li>2 hours before: "We\'re ready for you" message</li>\n</ul>\n\n<h3>Step 2: Two-Way Conversations</h3>\n<p>Unlike basic SMS, AI agents can:</p>\n<ul>\n  <li>Understand patient responses in natural language</li>\n  <li>Offer alternative time slots if rescheduling needed</li>\n  <li>Answer common questions (parking, documents, insurance)</li>\n  <li>Handle multiple languages automatically</li>\n  <li>Escalate complex requests to staff</li>\n</ul>\n\n<h3>Step 3: Automatic Slot Management</h3>\n<p>When a patient cancels or doesn\'t confirm:</p>\n<ol>\n  <li>System marks slot as available</li>\n  <li>Checks waitlist for matching appointments</li>\n  <li>Sends offers to waitlist patients via WhatsApp</li>\n  <li>Books first confirmed response</li>\n  <li>Updates calendar automatically</li>\n</ol>\n\n<h2>Real Case Study: 5-Doctor Clinic in Riyadh</h2>\n<p><strong>Before automation:</strong></p>\n<ul>\n  <li>No-show rate: 28%</li>\n  <li>2 staff members spent 4 hours daily on calls</li>\n  <li>15-20 wasted slots per week</li>\n  <li>Revenue loss: ~$12,000/month</li>\n</ul>\n\n<p><strong>After implementing AI assistant:</strong></p>\n<ul>\n  <li>No-show rate: 12% (57% reduction)</li>\n  <li>Staff time saved: 3.5 hours daily</li>\n  <li>Wasted slots: 4-6 per week</li>\n  <li>Revenue recovered: $8,500/month</li>\n  <li>Patient satisfaction: +35%</li>\n</ul>\n\n<h2>Key Features That Drive Results</h2>\n\n<h3>1. Multi-Channel Delivery</h3>\n<table>\n  <tr>\n    <th>Channel</th>\n    <th>Open Rate</th>\n    <th>Response Rate</th>\n  </tr>\n  <tr>\n    <td>WhatsApp</td>\n    <td>98%</td>\n    <td>70%</td>\n  </tr>\n  <tr>\n    <td>SMS</td>\n    <td>95%</td>\n    <td>35%</td>\n  </tr>\n  <tr>\n    <td>Phone Call</td>\n    <td>60%</td>\n    <td>45%</td>\n  </tr>\n  <tr>\n    <td>Email</td>\n    <td>25%</td>\n    <td>10%</td>\n  </tr>\n</table>\n\n<h3>2. Smart Personalization</h3>\n<p>Messages are tailored based on:</p>\n<ul>\n  <li>Patient history (first visit vs returning)</li>\n  <li>Appointment type (consultation, procedure, follow-up)</li>\n  <li>Previous behavior (punctual vs late pattern)</li>\n  <li>Preferred language</li>\n</ul>\n\n<h3>3. Real-Time Dashboard</h3>\n<p>Clinic managers see:</p>\n<ul>\n  <li>Today\'s confirmation status</li>\n  <li>Week-by-week no-show trends</li>\n  <li>Best/worst time slots</li>\n  <li>Patient response patterns</li>\n  <li>Automated revenue recovery metrics</li>\n</ul>\n\n<h2>Implementation Checklist</h2>\n\n<h3>Phase 1: Preparation (Week 1)</h3>\n<ol>\n  <li>Audit current no-show rates and patterns</li>\n  <li>Collect patient phone numbers and preferred contact method</li>\n  <li>Map your appointment types and typical workflows</li>\n  <li>Define cancellation/reschedule policies</li>\n</ol>\n\n<h3>Phase 2: Setup (Week 2-3)</h3>\n<ol>\n  <li>Connect calendar system (Google Calendar, booking software)</li>\n  <li>Configure WhatsApp Business API</li>\n  <li>Write message templates for each scenario</li>\n  <li>Test with 10-20 test patients</li>\n</ol>\n\n<h3>Phase 3: Launch (Week 4)</h3>\n<ol>\n  <li>Start with 50% of appointments</li>\n  <li>Monitor daily and adjust timing</li>\n  <li>Train staff on escalation procedures</li>\n  <li>Gradually increase to 100% coverage</li>\n</ol>\n\n<h2>Cost vs Benefit Analysis</h2>\n<p><strong>Typical costs:</strong></p>\n<ul>\n  <li>Setup: $1,500-3,000 (one-time)</li>\n  <li>Monthly: $200-500 (WhatsApp + automation)</li>\n  <li>Staff training: 4-6 hours</li>\n</ul>\n\n<p><strong>Expected returns (50-appointment/day clinic):</strong></p>\n<ul>\n  <li>Revenue recovery: $6,000-10,000/month</li>\n  <li>Staff time saved: $2,000-3,000/month</li>\n  <li>ROI timeline: 2-4 weeks</li>\n</ul>\n\n<h2>Common Mistakes to Avoid</h2>\n<ol>\n  <li><strong>Too many reminders:</strong> 4+ messages annoy patients</li>\n  <li><strong>Wrong timing:</strong> Sending reminders at 7 AM or 10 PM</li>\n  <li><strong>No human backup:</strong> Complex cases need staff escalation</li>\n  <li><strong>Ignoring feedback:</strong> Patients will tell you what works</li>\n  <li><strong>Not tracking metrics:</strong> You can\'t improve what you don\'t measure</li>\n</ol>\n\n<h2>Conclusion</h2>\n<p>AI-powered appointment management isn\'t just about technology—it\'s about respecting patient time, maximizing clinic resources, and improving healthcare delivery. Clinics that implement these systems see results within weeks and typically achieve 35-45% no-show reduction within 3 months.</p>\n<p>The question isn\'t whether to automate, but how quickly you can start.</p>',
+                    content_ar: '<h2>التكلفة الخفية لعدم حضور المرضى</h2>\n<p>يكلف عدم حضور المرضى العيادات الطبية آلاف الريالات شهريًا. عندما يتغيب مريض عن موعده دون إشعار، تخسر العيادة الإيرادات، تهدر وقت الموظفين، وتؤخر الرعاية للمرضى الآخرين الذين كان بإمكانهم استخدام هذا الوقت.</p>\n<p><strong>متوسط نسب عدم الحضور:</strong></p>\n<ul>\n  <li>عيادات الممارسة العامة: 15-25٪</li>\n  <li>عيادات التخصصات: 20-30٪</li>\n  <li>عيادات الأسنان: 10-20٪</li>\n</ul>\n\n<h2>لماذا تفشل أنظمة التذكير التقليدية</h2>\n<p>تعتمد معظم العيادات على المكالمات الهاتفية اليدوية أو رسائل SMS الأساسية. هذه الطرق لديها قيود خطيرة:</p>\n<ul>\n  <li><strong>عبء العمل:</strong> الاتصال بـ 50+ مريضًا يوميًا يستغرق 3-4 ساعات</li>\n  <li><strong>مشاكل التوقيت:</strong> يتلقى المرضى التذكيرات في أوقات غير مناسبة</li>\n  <li><strong>لا محادثة:</strong> الرسائل أحادية الاتجاه لا تسمح بإعادة الجدولة</li>\n  <li><strong>حواجز اللغة:</strong> قد يواجه الموظفون صعوبة مع غير الناطقين باللغة الأم</li>\n  <li><strong>لا متابعة:</strong> لا توجد بيانات واضحة عن من أكد ومن لم يؤكد</li>\n</ul>\n\n<h2>كيف تعمل مساعدات المواعيد بالذكاء الاصطناعي</h2>\n<p>يجمع وكيل الذكاء الاصطناعي بين فهم اللغة ومسارات العمل الآلية لإدارة دورة حياة الموعد بالكامل:</p>\n\n<h3>الخطوة 1: جدولة التذكير الذكي</h3>\n<p>يرسل النظام تلقائيًا تذكيرات في الأوقات المثلى:</p>\n<ul>\n  <li>قبل 7 أيام: طلب تأكيد أولي</li>\n  <li>قبل 48 ساعة: تذكير ثانٍ مع خيار إعادة الجدولة السهل</li>\n  <li>قبل 24 ساعة: تأكيد نهائي</li>\n  <li>قبل ساعتين: رسالة "نحن جاهزون لاستقبالك"</li>\n</ul>\n\n<h3>الخطوة 2: محادثات ثنائية الاتجاه</h3>\n<p>بخلاف الرسائل النصية الأساسية، يمكن لوكلاء الذكاء الاصطناعي:</p>\n<ul>\n  <li>فهم ردود المرضى باللغة الطبيعية</li>\n  <li>تقديم أوقات بديلة إذا لزمت إعادة الجدولة</li>\n  <li>الإجابة على الأسئلة الشائعة (المواقف، المستندات، التأمين)</li>\n  <li>التعامل مع لغات متعددة تلقائيًا</li>\n  <li>تصعيد الطلبات المعقدة للموظفين</li>\n</ul>\n\n<h3>الخطوة 3: إدارة الفترات التلقائية</h3>\n<p>عندما يلغي المريض أو لا يؤكد:</p>\n<ol>\n  <li>يضع النظام الفترة كمتاحة</li>\n  <li>يفحص قائمة الانتظار للمواعيد المطابقة</li>\n  <li>يرسل عروضًا لمرضى قائمة الانتظار عبر واتساب</li>\n  <li>يحجز أول رد مؤكد</li>\n  <li>يحدث التقويم تلقائيًا</li>\n</ol>\n\n<h2>دراسة حالة حقيقية: عيادة 5 أطباء في الرياض</h2>\n<p><strong>قبل الأتمتة:</strong></p>\n<ul>\n  <li>معدل عدم الحضور: 28٪</li>\n  <li>موظفان يقضيان 4 ساعات يوميًا في المكالمات</li>\n  <li>15-20 فترة ضائعة أسبوعيًا</li>\n  <li>خسارة إيرادات: ~45,000 ريال/شهر</li>\n</ul>\n\n<p><strong>بعد تطبيق المساعد الذكي:</strong></p>\n<ul>\n  <li>معدل عدم الحضور: 12٪ (انخفاض 57٪)</li>\n  <li>وقت الموظفين الموفر: 3.5 ساعة يوميًا</li>\n  <li>الفترات الضائعة: 4-6 أسبوعيًا</li>\n  <li>الإيرادات المستردة: 32,000 ريال/شهر</li>\n  <li>رضا المرضى: +35٪</li>\n</ul>\n\n<h2>الميزات الرئيسية التي تحقق النتائج</h2>\n\n<h3>1. التوصيل متعدد القنوات</h3>\n<table>\n  <tr>\n    <th>القناة</th>\n    <th>معدل الفتح</th>\n    <th>معدل الاستجابة</th>\n  </tr>\n  <tr>\n    <td>واتساب</td>\n    <td>98٪</td>\n    <td>70٪</td>\n  </tr>\n  <tr>\n    <td>رسائل نصية</td>\n    <td>95٪</td>\n    <td>35٪</td>\n  </tr>\n  <tr>\n    <td>مكالمة هاتفية</td>\n    <td>60٪</td>\n    <td>45٪</td>\n  </tr>\n  <tr>\n    <td>بريد إلكتروني</td>\n    <td>25٪</td>\n    <td>10٪</td>\n  </tr>\n</table>\n\n<h3>2. التخصيص الذكي</h3>\n<p>يتم تخصيص الرسائل بناءً على:</p>\n<ul>\n  <li>تاريخ المريض (زيارة أولى مقابل عائد)</li>\n  <li>نوع الموعد (استشارة، إجراء، متابعة)</li>\n  <li>السلوك السابق (نمط الالتزام بالمواعيد)</li>\n  <li>اللغة المفضلة</li>\n</ul>\n\n<h3>3. لوحة تحكم في الوقت الفعلي</h3>\n<p>يرى مديرو العيادات:</p>\n<ul>\n  <li>حالة التأكيد اليوم</li>\n  <li>اتجاهات عدم الحضور أسبوعًا بعد أسبوع</li>\n  <li>أفضل/أسوأ أوقات الفترات</li>\n  <li>أنماط استجابة المرضى</li>\n  <li>مقاييس استرداد الإيرادات التلقائية</li>\n</ul>\n\n<h2>قائمة التحقق من التنفيذ</h2>\n\n<h3>المرحلة 1: التحضير (الأسبوع 1)</h3>\n<ol>\n  <li>تدقيق معدلات وأنماط عدم الحضور الحالية</li>\n  <li>جمع أرقام هواتف المرضى وطريقة الاتصال المفضلة</li>\n  <li>رسم أنواع المواعيد ومسارات العمل النموذجية</li>\n  <li>تحديد سياسات الإلغاء/إعادة الجدولة</li>\n</ol>\n\n<h3>المرحلة 2: الإعداد (الأسبوع 2-3)</h3>\n<ol>\n  <li>ربط نظام التقويم (Google Calendar، برنامج الحجز)</li>\n  <li>تكوين واجهة برمجة تطبيقات واتساب للأعمال</li>\n  <li>كتابة قوالب الرسائل لكل سيناريو</li>\n  <li>اختبار مع 10-20 مريضًا تجريبيًا</li>\n</ol>\n\n<h3>المرحلة 3: الإطلاق (الأسبوع 4)</h3>\n<ol>\n  <li>البدء بـ 50٪ من المواعيد</li>\n  <li>المراقبة اليومية وضبط التوقيت</li>\n  <li>تدريب الموظفين على إجراءات التصعيد</li>\n  <li>الزيادة التدريجية إلى 100٪ تغطية</li>\n</ol>\n\n<h2>تحليل التكلفة مقابل الفائدة</h2>\n<p><strong>التكاليف النموذجية:</strong></p>\n<ul>\n  <li>الإعداد: 5,600-11,000 ريال (مرة واحدة)</li>\n  <li>شهري: 750-1,900 ريال (واتساب + أتمتة)</li>\n  <li>تدريب الموظفين: 4-6 ساعات</li>\n</ul>\n\n<p><strong>العوائد المتوقعة (عيادة 50 موعد/يوم):</strong></p>\n<ul>\n  <li>استرداد الإيرادات: 22,000-37,000 ريال/شهر</li>\n  <li>وقت الموظفين الموفر: 7,500-11,000 ريال/شهر</li>\n  <li>الجدول الزمني لعائد الاستثمار: 2-4 أسابيع</li>\n</ul>\n\n<h2>الأخطاء الشائعة التي يجب تجنبها</h2>\n<ol>\n  <li><strong>تذكيرات كثيرة جدًا:</strong> 4+ رسائل تزعج المرضى</li>\n  <li><strong>توقيت خاطئ:</strong> إرسال تذكيرات في الساعة 7 صباحًا أو 10 مساءً</li>\n  <li><strong>لا دعم بشري:</strong> الحالات المعقدة تحتاج تصعيد للموظفين</li>\n  <li><strong>تجاهل الملاحظات:</strong> سيخبرك المرضى بما ينجح</li>\n  <li><strong>عدم تتبع المقاييس:</strong> لا يمكنك تحسين ما لا تقيسه</li>\n</ol>\n\n<h2>الخلاصة</h2>\n<p>إدارة المواعيد بالذكاء الاصطناعي ليست مجرد تقنية—إنها احترام وقت المريض، تعظيم موارد العيادة، وتحسين تقديم الرعاية الصحية. العيادات التي تطبق هذه الأنظمة ترى النتائج خلال أسابيع وتحقق عادةً انخفاضًا بنسبة 35-45٪ في عدم الحضور خلال 3 أشهر.</p>\n<p>السؤال ليس ما إذا كان يجب الأتمتة، بل كم بسرعة يمكنك البدء.</p>',
+                    slug: 'ai-agents-reduce-no-show-clinics',
+                    category: 'Healthcare',
+                    author: 'NextAgent Team',
+                    image_url: '/images/blog/clinic-no-show.svg',
+                    tags: '{ai,automation,healthcare,appointments}',
+                    published: true
+                },
+                {
+                    title_en: 'From WhatsApp Chaos to Organized Bookings for Beauty Salons',
+                    title_ar: 'من فوضى الواتساب إلى حجوزات منظمة في صالونات التجميل',
+                    excerpt_en: 'Beauty salons handling 200+ WhatsApp messages daily struggle with double bookings, missed appointments, and overwhelmed staff. Learn how a women\'s salon in Jeddah transformed scattered chats into an organized booking system and reduced workload by 70%.',
+                    excerpt_ar: 'صالونات التجميل التي تتلقى 200+ رسالة واتساب يوميًا تعاني من الحجوزات المزدوجة، المواعيد الضائعة، والموظفات المرهقات. تعلم كيف حول صالون نسائي في جدة محادثاته المتناثرة إلى نظام حجز منظم وخفض عبء العمل بنسبة 70٪.',
+                    content_en: '<h2>The WhatsApp Booking Problem</h2>\\n<p>Most beauty salons in Saudi Arabia run their entire business through WhatsApp. Customers send messages at all hours asking about availability, prices, services, and booking slots. For salon owners, this creates chaos:</p>\\n<ul>\\n  <li>300+ messages per day during peak seasons</li>\\n  <li>Double bookings when two staff reply to the same customer</li>\\n  <li>Missed appointments because reminders weren\\'t sent</li>\\n  <li>No clear record of what was promised to each customer</li>\\n  <li>Staff burnout from managing chats while serving customers</li>\\n</ul>\\n\\n<h2>Real Case: Women\\'s Beauty Center in Jeddah</h2>\\n<p><strong>Business profile:</strong></p>\\n<ul>\\n  <li>8 service providers (hair, nails, makeup, spa)</li>\\n  <li>Open 9 AM – 10 PM, 7 days/week</li>\\n  <li>Average 40-50 bookings daily</li>\\n  <li>3 receptionists managing WhatsApp</li>\\n</ul>\\n\\n<p><strong>Pain points before automation:</strong></p>\\n<ul>\\n  <li>Staff spent 6-7 hours daily on WhatsApp</li>\\n  <li>12-15% double booking rate</li>\\n  <li>No-show rate: 18%</li>\\n  <li>Customers complained about slow responses (2-4 hour delays)</li>\\n  <li>Lost revenue: ~15,000 SAR/month from scheduling issues</li>\\n</ul>\\n\\n<h2>Step 1: Mapping WhatsApp Conversations</h2>\\n<p>We spent a week analyzing all WhatsApp interactions to identify patterns:</p>\\n\\n<h3>Common Customer Questions (80% of messages):</h3>\\n<table>\\n  <tr>\\n    <th>Question Type</th>\\n    <th>Frequency</th>\\n    <th>Can Automate?</th>\\n  </tr>\\n  <tr>\\n    <td>\"What are your prices?\"</td>\\n    <td>35%</td>\\n    <td>Yes</td>\\n  </tr>\\n  <tr>\\n    <td>\"Are you available at X time?\"</td>\\n    <td>25%</td>\\n    <td>Yes</td>\\n  </tr>\\n  <tr>\\n    <td>\"I want to book...\"</td>\\n    <td>20%</td>\\n    <td>Partial</td>\\n  </tr>\\n  <tr>\\n    <td>\"Can I reschedule?\"</td>\\n    <td>10%</td>\\n    <td>Yes</td>\\n  </tr>\\n  <tr>\\n    <td>Complex/custom requests</td>\\n    <td>10%</td>\\n    <td>No</td>\\n  </tr>\\n</table>\\n\\n<h3>Booking Workflow:</h3>\\n<ol>\\n  <li>Customer asks about service/price</li>\\n  <li>Staff confirms availability</li>\\n  <li>Customer chooses time slot</li>\\n  <li>Staff checks calendar (Google Sheets)</li>\\n  <li>Manual confirmation sent</li>\\n  <li>Reminder sent 1 day before (if remembered)</li>\\n</ol>\\n\\n<h2>Step 2: Designing the Automation Layer</h2>\\n\\n<h3>What We Automated:</h3>\\n<ul>\\n  <li><strong>Service catalog & prices:</strong> Auto-reply with menu when customer asks</li>\\n  <li><strong>Availability check:</strong> System checks calendar and offers 3 nearest slots</li>\\n  <li><strong>Booking confirmation:</strong> System books slot and sends confirmation with details</li>\\n  <li><strong>Automated reminders:</strong> WhatsApp messages 24h and 2h before appointment</li>\\n  <li><strong>Rescheduling:</strong> System offers alternative times if customer cancels</li>\\n  <li><strong>Follow-up:</strong> \"How was your visit?\" message after service</li>\\n</ul>\\n\\n<h3>What Stayed Human:</h3>\\n<ul>\\n  <li>Custom packages and special requests</li>\\n  <li>VIP customer handling</li>\\n  <li>Complaints and problems</li>\\n  <li>Last-minute emergencies</li>\\n</ul>\\n\\n<h2>Step 3: Technical Implementation</h2>\\n\\n<h3>Tools Used:</h3>\\n<ul>\\n  <li><strong>WhatsApp Business API</strong> (official, not personal WhatsApp)</li>\\n  <li><strong>Google Calendar</strong> for scheduling</li>\\n  <li><strong>Google Sheets</strong> for customer database</li>\\n  <li><strong>n8n</strong> for workflow automation</li>\\n  <li><strong>OpenAI GPT-4</strong> for understanding Arabic messages</li>\\n</ul>\\n\\n<h3>Sample Message Flow:</h3>\\n<pre>\\nCustomer: \"مرحبا، كم سعر المكياج الكامل؟\"\\n(Hello, how much is full makeup?)\\n\\nSystem: \"مرحبًا! 💄\\nمكياج كامل: 350 ريال\\nمكياج سهرة: 500 ريال\\nمكياج عروس: 800+ ريال\\n\\nهل تودين حجز موعد؟\"\\n(Hello! Full makeup: 350 SAR...\\nWould you like to book?)\\n\\nCustomer: \"نعم، يوم الخميس\"\\n(Yes, Thursday)\\n\\nSystem: \"الأوقات المتاحة يوم الخميس:\\n1️⃣ 10:00 صباحًا\\n2️⃣ 2:00 ظهرًا\\n3️⃣ 6:00 مساءً\\n\\nأرسلي رقم الوقت المناسب\"\\n(Available Thursday slots: 10 AM, 2 PM, 6 PM\\nSend the number)\\n\\nCustomer: \"2\"\\n\\nSystem: \"تم الحجز! ✅\\nالخدمة: مكياج كامل\\nالموعد: الخميس 2:00 ظهرًا\\nالمدة: ساعة واحدة\\nالسعر: 350 ريال\\n\\nسنرسل لك تذكير قبل الموعد بيوم ❤️\"\\n(Booked! Service: Full makeup\\nThursday 2 PM, 1 hour, 350 SAR\\nWe\\'ll remind you 1 day before)\\n</pre>\\n\\n<h2>Results After 3 Months</h2>\\n\\n<h3>Operational Improvements:</h3>\\n<table>\\n  <tr>\\n    <th>Metric</th>\\n    <th>Before</th>\\n    <th>After</th>\\n    <th>Change</th>\\n  </tr>\\n  <tr>\\n    <td>Response time</td>\\n    <td>2-4 hours</td>\\n    <td>< 2 minutes</td>\\n    <td>-95%</td>\\n  </tr>\\n  <tr>\\n    <td>Staff time on WhatsApp</td>\\n    <td>6-7 hrs/day</td>\\n    <td>2 hrs/day</td>\\n    <td>-70%</td>\\n  </tr>\\n  <tr>\\n    <td>Double bookings</td>\\n    <td>12-15%</td>\\n    <td>< 2%</td>\\n    <td>-87%</td>\\n  </tr>\\n  <tr>\\n    <td>No-show rate</td>\\n    <td>18%</td>\\n    <td>8%</td>\\n    <td>-56%</td>\\n  </tr>\\n  <tr>\\n    <td>Daily bookings</td>\\n    <td>40-50</td>\\n    <td>60-70</td>\\n    <td>+40%</td>\\n  </tr>\\n</table>\\n\\n<h3>Financial Impact:</h3>\\n<ul>\\n  <li><strong>Revenue increase:</strong> +25,000 SAR/month (from more bookings)</li>\\n  <li><strong>Saved labor cost:</strong> Reduced from 3 to 2 receptionists = 4,000 SAR/month</li>\\n  <li><strong>Lost revenue recovered:</strong> 12,000 SAR/month (fewer double bookings/no-shows)</li>\\n  <li><strong>Total improvement:</strong> ~41,000 SAR/month</li>\\n  <li><strong>System cost:</strong> 2,000 SAR/month</li>\\n  <li><strong>Net gain:</strong> 39,000 SAR/month</li>\\n</ul>\\n\\n<h2>Implementation Timeline</h2>\\n\\n<h3>Week 1: Discovery & Mapping</h3>\\n<ul>\\n  <li>Analyze 7 days of WhatsApp conversations</li>\\n  <li>Identify most common questions</li>\\n  <li>Map current booking workflow</li>\\n  <li>Document service menu and prices</li>\\n</ul>\\n\\n<h3>Week 2: Setup & Configuration</h3>\\n<ul>\\n  <li>Apply for WhatsApp Business API</li>\\n  <li>Connect Google Calendar</li>\\n  <li>Build message templates</li>\\n  <li>Configure business hours and rules</li>\\n</ul>\\n\\n<h3>Week 3: Testing & Training</h3>\\n<ul>\\n  <li>Test with 20 real bookings</li>\\n  <li>Train staff on the new system</li>\\n  <li>Create escalation procedures</li>\\n  <li>Set up dashboard for monitoring</li>\\n</ul>\\n\\n<h3>Week 4: Soft Launch</h3>\\n<ul>\\n  <li>Enable for 50% of incoming messages</li>\\n  <li>Monitor daily performance</li>\\n  <li>Adjust message tone and timing</li>\\n  <li>Scale to 100% after confidence</li>\\n</ul>\\n\\n<h2>Key Success Factors</h2>\\n\\n<h3>1. Arabic Language Understanding</h3>\\n<p>System must handle:</p>\\n<ul>\\n  <li>Gulf dialect variations</li>\\n  <li>Emoji usage</li>\\n  <li>Shortened informal text</li>\\n  <li>Voice message transcription</li>\\n</ul>\\n\\n<h3>2. Cultural Sensitivity</h3>\\n<ul>\\n  <li>Women-only salon: all language is feminine</li>\\n  <li>Prayer time awareness: don\\'t offer slots during prayer</li>\\n  <li>Weekend = Friday/Saturday in Saudi Arabia</li>\\n  <li>Ramadan adjustments: different hours</li>\\n</ul>\\n\\n<h3>3. Smart Escalation</h3>\\n<p>System escalates to human staff when:</p>\\n<ul>\\n  <li>Customer seems frustrated (angry emojis, caps lock)</li>\\n  <li>Request is too complex or custom</li>\\n  <li>VIP customer (flagged in database)</li>\\n  <li>3+ back-and-forth without resolution</li>\\n</ul>\\n\\n<h2>Common Mistakes to Avoid</h2>\\n<ol>\\n  <li><strong>Over-automation:</strong> Don\\'t automate VIP or complex requests</li>\\n  <li><strong>Robotic tone:</strong> Use warm, friendly language with emojis</li>\\n  <li><strong>No fallback:</strong> Always have a \"speak to human\" option</li>\\n  <li><strong>Ignoring feedback:</strong> Customers will tell you what doesn\\'t work</li>\\n  <li><strong>Rigid slots:</strong> Allow buffer time between appointments</li>\\n</ol>\\n\\n<h2>Minimum Viable Automation</h2>\\n<p>If you\\'re just starting, begin with these 3 automations:</p>\\n<ol>\\n  <li><strong>Auto-reply with service menu</strong> when someone says \"prices\" or \"services\"</li>\\n  <li><strong>24-hour reminder</strong> for all confirmed bookings</li>\\n  <li><strong>Availability check</strong> that shows 3 nearest open slots</li>\\n</ol>\\n<p>This alone will reduce staff workload by 40-50% and can be implemented in 2-3 weeks.</p>\\n\\n<h2>Conclusion</h2>\\n<p>Automation doesn\\'t mean removing the human touch—it means freeing your staff to focus on what matters: delivering excellent service. The beauty salon we worked with now handles 40% more customers with less stress, faster responses, and happier staff.</p>\\n<p>WhatsApp automation is not about replacing people; it\\'s about respecting their time and maximizing business potential.</p>',
+                    content_ar: '<h2>مشكلة الحجز عبر الواتساب</h2>\\n<p>معظم صالونات التجميل في السعودية تدير كامل عملها عبر الواتساب. العميلات يرسلن رسائل في كل وقت يسألن عن التوفر، الأسعار، الخدمات، والمواعيد. بالنسبة لأصحاب الصالونات، هذا يخلق فوضى:</p>\\n<ul>\\n  <li>أكثر من 300 رسالة يوميًا في المواسم</li>\\n  <li>حجوزات مزدوجة عندما تجيب موظفتان على نفس العميلة</li>\\n  <li>مواعيد ضائعة لأن التذكير لم يُرسل</li>\\n  <li>لا توجد سجلات واضحة لما وُعدت به كل عميلة</li>\\n  <li>إرهاق الموظفات من إدارة المحادثات أثناء خدمة العملاء</li>\\n</ul>\\n\\n<h2>حالة حقيقية: مركز تجميل نسائي في جدة</h2>\\n<p><strong>نبذة عن المنشأة:</strong></p>\\n<ul>\\n  <li>8 مقدمات خدمة (شعر، أظافر، مكياج، سبا)</li>\\n  <li>العمل من 9 صباحًا – 10 مساءً، 7 أيام/أسبوع</li>\\n  <li>متوسط 40-50 حجز يوميًا</li>\\n  <li>3 موظفات استقبال يديرن الواتساب</li>\\n</ul>\\n\\n<p><strong>نقاط الألم قبل الأتمتة:</strong></p>\\n<ul>\\n  <li>الموظفات تقضي 6-7 ساعات يوميًا على الواتساب</li>\\n  <li>معدل الحجز المزدوج: 12-15٪</li>\\n  <li>معدل عدم الحضور: 18٪</li>\\n  <li>شكاوى العميلات من بطء الرد (تأخير 2-4 ساعات)</li>\\n  <li>خسارة إيرادات: ~15,000 ريال/شهر من مشاكل الجدولة</li>\\n</ul>\\n\\n<h2>الخطوة 1: رسم محادثات الواتساب</h2>\\n<p>قضينا أسبوعًا في تحليل جميع التفاعلات عبر الواتساب لتحديد الأنماط:</p>\\n\\n<h3>أسئلة العملاء الشائعة (80٪ من الرسائل):</h3>\\n<table>\\n  <tr>\\n    <th>نوع السؤال</th>\\n    <th>التكرار</th>\\n    <th>يمكن أتمتته؟</th>\\n  </tr>\\n  <tr>\\n    <td>\"كم سعر...؟\"</td>\\n    <td>35٪</td>\\n    <td>نعم</td>\\n  </tr>\\n  <tr>\\n    <td>\"هل متوفر وقت...؟\"</td>\\n    <td>25٪</td>\\n    <td>نعم</td>\\n  </tr>\\n  <tr>\\n    <td>\"أبغى أحجز...\"</td>\\n    <td>20٪</td>\\n    <td>جزئيًا</td>\\n  </tr>\\n  <tr>\\n    <td>\"ممكن أغير الموعد؟\"</td>\\n    <td>10٪</td>\\n    <td>نعم</td>\\n  </tr>\\n  <tr>\\n    <td>طلبات معقدة/مخصصة</td>\\n    <td>10٪</td>\\n    <td>لا</td>\\n  </tr>\\n</table>\\n\\n<h3>سير عمل الحجز:</h3>\\n<ol>\\n  <li>العميلة تسأل عن الخدمة/السعر</li>\\n  <li>الموظفة تؤكد التوفر</li>\\n  <li>العميلة تختار الوقت</li>\\n  <li>الموظفة تفحص التقويم (Google Sheets)</li>\\n  <li>تأكيد يدوي يُرسل</li>\\n  <li>تذكير يُرسل قبل يوم (إذا تذكروا)</li>\\n</ol>\\n\\n<h2>الخطوة 2: تصميم طبقة الأتمتة</h2>\\n\\n<h3>ما تمت أتمتته:</h3>\\n<ul>\\n  <li><strong>قائمة الخدمات والأسعار:</strong> رد تلقائي بالقائمة عند السؤال</li>\\n  <li><strong>فحص التوفر:</strong> النظام يفحص التقويم ويعرض 3 أوقات قريبة</li>\\n  <li><strong>تأكيد الحجز:</strong> النظام يحجز الوقت ويرسل تأكيد بالتفاصيل</li>\\n  <li><strong>تذكيرات تلقائية:</strong> رسائل واتساب قبل 24 ساعة وساعتين</li>\\n  <li><strong>إعادة الجدولة:</strong> النظام يعرض أوقات بديلة عند الإلغاء</li>\\n  <li><strong>المتابعة:</strong> رسالة \"كيف كانت الزيارة؟\" بعد الخدمة</li>\\n</ul>\\n\\n<h3>ما بقي بشري:</h3>\\n<ul>\\n  <li>الباقات المخصصة والطلبات الخاصة</li>\\n  <li>التعامل مع عملاء VIP</li>\\n  <li>الشكاوى والمشاكل</li>\\n  <li>الطوارئ في اللحظة الأخيرة</li>\\n</ul>\\n\\n<h2>الخطوة 3: التنفيذ التقني</h2>\\n\\n<h3>الأدوات المستخدمة:</h3>\\n<ul>\\n  <li><strong>WhatsApp Business API</strong> (رسمي، ليس واتساب شخصي)</li>\\n  <li><strong>Google Calendar</strong> للجدولة</li>\\n  <li><strong>Google Sheets</strong> لقاعدة بيانات العملاء</li>\\n  <li><strong>n8n</strong> لأتمتة سير العمل</li>\\n  <li><strong>OpenAI GPT-4</strong> لفهم الرسائل العربية</li>\\n</ul>\\n\\n<h3>نموذج سير الرسائل:</h3>\\n<pre>\\nالعميلة: \"مرحبا، كم سعر المكياج الكامل؟\"\\n\\nالنظام: \"مرحبًا! 💄\\nمكياج كامل: 350 ريال\\nمكياج سهرة: 500 ريال\\nمكياج عروس: 800+ ريال\\n\\nهل تودين حجز موعد؟\"\\n\\nالعميلة: \"نعم، يوم الخميس\"\\n\\nالنظام: \"الأوقات المتاحة يوم الخميس:\\n1️⃣ 10:00 صباحًا\\n2️⃣ 2:00 ظهرًا\\n3️⃣ 6:00 مساءً\\n\\nأرسلي رقم الوقت المناسب\"\\n\\nالعميلة: \"2\"\\n\\nالنظام: \"تم الحجز! ✅\\nالخدمة: مكياج كامل\\nالموعد: الخميس 2:00 ظهرًا\\nالمدة: ساعة واحدة\\nالسعر: 350 ريال\\n\\nسنرسل لك تذكير قبل الموعد بيوم ❤️\"\\n</pre>\\n\\n<h2>النتائج بعد 3 أشهر</h2>\\n\\n<h3>التحسينات التشغيلية:</h3>\\n<table>\\n  <tr>\\n    <th>المقياس</th>\\n    <th>قبل</th>\\n    <th>بعد</th>\\n    <th>التغيير</th>\\n  </tr>\\n  <tr>\\n    <td>وقت الرد</td>\\n    <td>2-4 ساعات</td>\\n    <td>< دقيقتين</td>\\n    <td>-95٪</td>\\n  </tr>\\n  <tr>\\n    <td>وقت الموظفات على الواتساب</td>\\n    <td>6-7 س/يوم</td>\\n    <td>2 س/يوم</td>\\n    <td>-70٪</td>\\n  </tr>\\n  <tr>\\n    <td>الحجوزات المزدوجة</td>\\n    <td>12-15٪</td>\\n    <td>< 2٪</td>\\n    <td>-87٪</td>\\n  </tr>\\n  <tr>\\n    <td>عدم الحضور</td>\\n    <td>18٪</td>\\n    <td>8٪</td>\\n    <td>-56٪</td>\\n  </tr>\\n  <tr>\\n    <td>الحجوزات اليومية</td>\\n    <td>40-50</td>\\n    <td>60-70</td>\\n    <td>+40٪</td>\\n  </tr>\\n</table>\\n\\n<h3>الأثر المالي:</h3>\\n<ul>\\n  <li><strong>زيادة الإيرادات:</strong> +25,000 ريال/شهر (من المزيد من الحجوزات)</li>\\n  <li><strong>توفير تكلفة العمالة:</strong> من 3 إلى 2 موظفات = 4,000 ريال/شهر</li>\\n  <li><strong>استرداد إيرادات ضائعة:</strong> 12,000 ريال/شهر (حجوزات مزدوجة/عدم حضور أقل)</li>\\n  <li><strong>إجمالي التحسين:</strong> ~41,000 ريال/شهر</li>\\n  <li><strong>تكلفة النظام:</strong> 2,000 ريال/شهر</li>\\n  <li><strong>صافي الربح:</strong> 39,000 ريال/شهر</li>\\n</ul>\\n\\n<h2>الجدول الزمني للتنفيذ</h2>\\n\\n<h3>الأسبوع 1: الاستكشاف والرسم</h3>\\n<ul>\\n  <li>تحليل 7 أيام من محادثات الواتساب</li>\\n  <li>تحديد الأسئلة الأكثر شيوعًا</li>\\n  <li>رسم سير عمل الحجز الحالي</li>\\n  <li>توثيق قائمة الخدمات والأسعار</li>\\n</ul>\\n\\n<h3>الأسبوع 2: الإعداد والتكوين</h3>\\n<ul>\\n  <li>التقديم على WhatsApp Business API</li>\\n  <li>ربط Google Calendar</li>\\n  <li>بناء قوالب الرسائل</li>\\n  <li>تكوين ساعات العمل والقواعد</li>\\n</ul>\\n\\n<h3>الأسبوع 3: الاختبار والتدريب</h3>\\n<ul>\\n  <li>اختبار مع 20 حجز حقيقي</li>\\n  <li>تدريب الموظفات على النظام الجديد</li>\\n  <li>إنشاء إجراءات التصعيد</li>\\n  <li>إعداد لوحة مراقبة</li>\\n</ul>\\n\\n<h3>الأسبوع 4: الإطلاق التجريبي</h3>\\n<ul>\\n  <li>تفعيل لـ 50٪ من الرسائل الواردة</li>\\n  <li>مراقبة الأداء اليومي</li>\\n  <li>ضبط نبرة الرسائل والتوقيت</li>\\n  <li>التوسع إلى 100٪ بعد الثقة</li>\\n</ul>\\n\\n<h2>عوامل النجاح الرئيسية</h2>\\n\\n<h3>1. فهم اللغة العربية</h3>\\n<p>يجب على النظام التعامل مع:</p>\\n<ul>\\n  <li>اختلافات اللهجة الخليجية</li>\\n  <li>استخدام الإيموجي</li>\\n  <li>النص غير الرسمي المختصر</li>\\n  <li>تحويل الرسائل الصوتية إلى نص</li>\\n</ul>\\n\\n<h3>2. الحساسية الثقافية</h3>\\n<ul>\\n  <li>صالون نسائي فقط: كل اللغة بصيغة المؤنث</li>\\n  <li>الوعي بوقت الصلاة: لا تعرض أوقات أثناء الصلاة</li>\\n  <li>عطلة نهاية الأسبوع = جمعة/سبت في السعودية</li>\\n  <li>تعديلات رمضان: ساعات مختلفة</li>\\n</ul>\\n\\n<h3>3. التصعيد الذكي</h3>\\n<p>يصعّد النظام إلى الموظفات البشريات عندما:</p>\\n<ul>\\n  <li>تبدو العميلة محبطة (إيموجي غاضب، حروف كبيرة)</li>\\n  <li>الطلب معقد جدًا أو مخصص</li>\\n  <li>عميلة VIP (مُعلّمة في قاعدة البيانات)</li>\\n  <li>3+ تبادلات ذهابًا وإيابًا بدون حل</li>\\n</ul>\\n\\n<h2>الأخطاء الشائعة التي يجب تجنبها</h2>\\n<ol>\\n  <li><strong>الإفراط في الأتمتة:</strong> لا تؤتمت طلبات VIP أو المعقدة</li>\\n  <li><strong>نبرة آلية:</strong> استخدمي لغة دافئة وودية مع الإيموجي</li>\\n  <li><strong>لا يوجد بديل:</strong> دائمًا اتركي خيار \"التحدث إلى موظفة\"</li>\\n  <li><strong>تجاهل الملاحظات:</strong> العميلات سيخبرنك بما لا ينجح</li>\\n  <li><strong>أوقات جامدة:</strong> اسمحي بوقت احتياطي بين المواعيد</li>\\n</ol>\\n\\n<h2>الحد الأدنى من الأتمتة القابلة للتطبيق</h2>\\n<p>إذا كنت تبدأين للتو، ابدئي بهذه الأتمتات الثلاث:</p>\\n<ol>\\n  <li><strong>رد تلقائي بقائمة الخدمات</strong> عندما يقول أحد \"أسعار\" أو \"خدمات\"</li>\\n  <li><strong>تذكير 24 ساعة</strong> لجميع الحجوزات المؤكدة</li>\\n  <li><strong>فحص التوفر</strong> الذي يعرض 3 أوقات متاحة قريبة</li>\\n</ol>\\n<p>هذا وحده سيقلل عبء عمل الموظفات بنسبة 40-50٪ ويمكن تنفيذه في 2-3 أسابيع.</p>\\n\\n<h2>الخلاصة</h2>\\n<p>الأتمتة لا تعني إزالة اللمسة البشرية—بل تعني تحرير موظفاتك للتركيز على ما يهم: تقديم خدمة ممتازة. صالون التجميل الذي عملنا معه يتعامل الآن مع 40٪ أكثر من العميلات بضغط أقل، وردود أسرع، وموظفات أسعد.</p>\\n<p>أتمتة الواتساب ليست عن استبدال الناس؛ بل عن احترام وقتهم وتعظيم إمكانات العمل.</p>',
+                    slug: 'whatsapp-to-organized-bookings-beauty-salons',
+                    category: 'Business',
+                    author: 'NextAgent Team',
+                    image_url: '/images/blog/beauty-salon-automation.svg',
+                    tags: '{whatsapp,automation,beauty,bookings}',
+                    published: true
+                },
+                {
+                    title_en: 'What Is an AI Agent and Where Does It Actually Make Sense in SMEs?',
+                    title_ar: 'ما هو وكيل الذكاء الاصطناعي وأين يناسب فعليًا في المنشآت الصغيرة والمتوسطة؟',
+                    excerpt_en: 'A clear and practical explanation of what AI agents actually are, how they differ from chatbots, and where small and medium businesses can use them to reduce workload, improve accuracy, and scale operations.',
+                    excerpt_ar: 'شرح عملي ومبسط لوكلاء الذكاء الاصطناعي، الفرق بينهم وبين الشات بوت التقليدي، وكيف يمكن للمنشآت الصغيرة والمتوسطة استخدامها لتقليل الجهد وزيادة الدقة وتحسين تجربة العملاء.',
+                    content_en: '<h2>Introduction</h2>\n<p>AI agents are becoming foundational tools for modern service businesses. Unlike traditional chatbots that follow rigid scripts, AI agents understand context, take actions, and automate end-to-end workflows. For SMEs, this translates to fewer mistakes, faster response times, and significantly lower operating costs.</p>\n\n<h2>What Is an AI Agent?</h2>\n<p>An AI agent is not a robot or a chatbot with a nicer interface. It is a system that combines a language model (LLM) with your business tools—calendars, CRM, WhatsApp, email, booking systems—to understand tasks and perform actions automatically.</p>\n<ul>\n  <li>Reads and understands customer messages</li>\n  <li>Books appointments and manages schedules</li>\n  <li>Updates CRM and databases</li>\n  <li>Sends automated reminders and follow-ups</li>\n  <li>Escalates to a human if needed</li>\n  <li>Tracks performance and statistics</li>\n</ul>\n\n<h2>AI Agent vs Traditional Chatbot</h2>\n<table>\n  <tr>\n    <th>Feature</th>\n    <th>Chatbot</th>\n    <th>AI Agent</th>\n  </tr>\n  <tr>\n    <td>Understands context</td>\n    <td>No</td>\n    <td>Yes</td>\n  </tr>\n  <tr>\n    <td>Handles full workflows</td>\n    <td>No</td>\n    <td>Yes</td>\n  </tr>\n  <tr>\n    <td>Connects to CRM & tools</td>\n    <td>Limited</td>\n    <td>Full integration</td>\n  </tr>\n</table>\n\n<h2>Where AI Agents Make Sense in SMEs</h2>\n\n<h3>1) Medical Clinics</h3>\n<ul>\n  <li>Booking automation</li>\n  <li>WhatsApp & SMS reminders</li>\n  <li>No-show reduction systems</li>\n  <li>Cancellation handling</li>\n</ul>\n<p>Average improvement: 35–40% no-show reduction, 60% less manual workload.</p>\n\n<h3>2) Beauty Salons</h3>\n<ul>\n  <li>WhatsApp booking assistance</li>\n  <li>Promotion message automation</li>\n  <li>Customer segmentation</li>\n</ul>\n\n<h3>3) Service Offices & Consulting Agencies</h3>\n<ul>\n  <li>Lead qualification</li>\n  <li>Document collection</li>\n  <li>Meeting scheduling</li>\n  <li>CRM syncing</li>\n</ul>\n\n<h2>Basic Architecture of an AI Agent System</h2>\n<p>An AI agent typically looks like this:</p>\n<pre>\nUser → WhatsApp/Website → AI Agent (LLM)\n      → Business Logic Layer\n      → Integrations (n8n/APIs)\n      → CRM / Sheets / Calendar\n      → Notifications\n</pre>\n\n<h2>Real Examples</h2>\n\n<h3>Clinic in Riyadh</h3>\n<ul>\n  <li>5 doctors</li>\n  <li>24/7 booking automation</li>\n  <li>No-show reduced to 12%</li>\n</ul>\n\n<h3>Beauty Center in Jeddah</h3>\n<ul>\n  <li>200–300 daily WhatsApp messages</li>\n  <li>Workload reduced by 70%</li>\n</ul>\n\n<h2>When Should You Not Use AI Agents?</h2>\n<ul>\n  <li>Legal decision-making</li>\n  <li>Medical diagnosis</li>\n  <li>Highly regulated workflows without APIs</li>\n</ul>\n\n<h2>3-Phase Roadmap</h2>\n<ol>\n  <li>Map your processes</li>\n  <li>Automate simple tasks first</li>\n  <li>Add AI agents on top</li>\n</ol>\n\n<h2>Conclusion</h2>\n<p>AI agents deliver measurable value—faster operations, fewer errors, and higher revenue. SMEs that adopt AI early will gain a strong competitive advantage over the next 3–5 years.</p>',
+                    content_ar: '<h2>مقدمة</h2>\n<p>أصبحت وكلاء الذكاء الاصطناعي جزءًا أساسيًا في تطوير المنشآت الخدمية الحديثة. بخلاف الشات بوت التقليدي، يستطيع وكيل الذكاء الاصطناعي فهم السياق، اتخاذ القرارات، وتنفيذ مهام كاملة من البداية للنهاية. وهذا يعني تقليل الأخطاء، سرعة أكبر في الردود، وتخفيض كبير في الجهد التشغيلي.</p>\n\n<h2>ما هو وكيل الذكاء الاصطناعي؟</h2>\n<p>وكيل الذكاء الاصطناعي ليس روبوتًا أو شات بوت متطورًا، بل نظام يدمج نموذج لغة (LLM) مع أدوات عملك—مثل التقويمات، الـ CRM، الواتساب، البريد الإلكتروني، وأنظمة الحجز—ليقوم بفهم المهام وتنفيذها تلقائيًا.</p>\n<ul>\n  <li>فهم الرسائل وتحليلها</li>\n  <li>إدارة الحجوزات والمواعيد</li>\n  <li>تحديث قواعد البيانات</li>\n  <li>إرسال التذكيرات والمتابعات</li>\n  <li>تحويل الحالات المعقدة لموظف بشري</li>\n  <li>متابعة الأداء والمؤشرات</li>\n</ul>\n\n<h2>الفرق بين وكيل الذكاء الاصطناعي والشات بوت التقليدي</h2>\n<table>\n  <tr>\n    <th>الميزة</th>\n    <th>شات بوت</th>\n    <th>وكيل ذكاء اصطناعي</th>\n  </tr>\n  <tr>\n    <td>فهم السياق</td>\n    <td>لا</td>\n    <td>نعم</td>\n  </tr>\n  <tr>\n    <td>تنفيذ مسارات عمل كاملة</td>\n    <td>لا</td>\n    <td>نعم</td>\n  </tr>\n  <tr>\n    <td>الربط بالأنظمة</td>\n    <td>محدود</td>\n    <td>كامل</td>\n  </tr>\n</table>\n\n<h2>أين يناسب وكيل الذكاء الاصطناعي في المنشآت الصغيرة والمتوسطة؟</h2>\n\n<h3>1) العيادات الطبية</h3>\n<ul>\n  <li>أتمتة حجز المواعيد</li>\n  <li>تذكيرات تلقائية</li>\n  <li>تقليل نسبة عدم الحضور</li>\n  <li>إدارة الإلغاءات</li>\n</ul>\n\n<h3>2) صالونات التجميل</h3>\n<ul>\n  <li>مساعد واتساب للحجوزات</li>\n  <li>إرسال العروض والترويجات</li>\n  <li>تقسيم العملاء</li>\n</ul>\n\n<h3>3) مكاتب الخدمات والاستشارات</h3>\n<ul>\n  <li>تأهيل العملاء المحتملين</li>\n  <li>جمع المستندات</li>\n  <li>تنظيم الاجتماعات</li>\n  <li>مزامنة البيانات</li>\n</ul>\n\n<h2>البنية الأساسية لوكيل الذكاء الاصطناعي</h2>\n<pre>\nالعميل → واتساب / موقع → وكيل الذكاء الاصطناعي\n        → منطق العمل\n        → الدمج مع الأنظمة (n8n/APIs)\n        → CRM / Sheets / Calendar\n        → الإشعارات\n</pre>\n\n<h2>أمثلة حقيقية</h2>\n\n<h3>عيادة في الرياض</h3>\n<ul>\n  <li>٥ أطباء</li>\n  <li>أتمتة كاملة للحجوزات</li>\n  <li>انخفاض نسبة عدم الحضور إلى ١٢٪</li>\n</ul>\n\n<h3>مركز تجميل نسائي في جدة</h3>\n<ul>\n  <li>٢٠٠–٣٠٠ رسالة واتساب يوميًا</li>\n  <li>انخفاض عبء العمل بنسبة ٧٠٪</li>\n</ul>\n\n<h2>متى لا يجب استخدام وكلاء الذكاء الاصطناعي؟</h2>\n<ul>\n  <li>التحليل القانوني</li>\n  <li>التشخيص الطبي</li>\n  <li>العمليات شديدة الحساسية بدون تكاملات</li>\n</ul>\n\n<h2>خارطة طريق من ٣ مراحل</h2>\n<ol>\n  <li>رسم العمليات الحالية</li>\n  <li>أتمتة المهام البسيطة</li>\n  <li>إضافة وكيل الذكاء الاصطناعي</li>\n</ol>\n\n<h2>الخلاصة</h2>\n<p>وكلاء الذكاء الاصطناعي يقدمون قيمة واضحة—عمليات أسرع، أخطاء أقل، وإيرادات أعلى. المنشآت التي تعتمد عليهم مبكرًا ستحصل على أفضلية تنافسية قوية خلال السنوات القادمة.</p>',
+                    slug: 'what-is-an-ai-agent-for-smes',
+                    category: 'AI & Technology',
+                    author: 'NextAgent Team',
+                    image_url: '/images/blog/ai-agent-for-smes.svg',
+                    tags: '{ai,agents,smes,explainer}',
+                    published: true
+                },
+                {
+                    title_en: 'Building an Always-On Follow-Up System for Leads Using n8n',
+                    title_ar: 'بناء نظام متابعة تلقائي للعملاء المحتملين باستخدام n8n',
+                    excerpt_en: 'Most businesses lose leads simply because nobody follows up on time. We show how to build an always-on follow-up system using n8n and simple tools you already have.',
+                    excerpt_ar: 'الكثير من الشركات تخسر عملاء محتملين فقط لأن المتابعة لا تتم في الوقت المناسب. في هذا المقال نشرح كيف تبني نظام متابعة تلقائي باستخدام n8n وأدوات بسيطة لديك بالفعل.',
+                    content_en: 'We walk through a full n8n workflow that connects web forms, CRMs, and WhatsApp/email to ensure every lead receives a timely follow-up.\n\nYou will see how leads are scored, how tasks are created for sales teams, and how to measure response times without adding new software.',
+                    content_ar: 'نستعرض مسار عمل كامل في n8n يربط نماذج الموقع، أنظمة الـ CRM، والواتساب/الإيميل لضمان أن كل عميل محتمل يتلقى متابعة في الوقت المناسب.\n\nسترى كيف يتم تقييم العملاء المحتملين، وكيف تُنشأ مهام لمندوبي المبيعات، وكيف يمكن قياس زمن الاستجابة بدون إضافة أنظمة جديدة معقدة.',
+                    slug: 'always-on-follow-up-system-n8n',
+                    category: 'Marketing',
+                    author: 'NextAgent Team',
+                    image_url: '/images/blog/lead-followup-n8n.svg',
+                    tags: '{n8n,automation,leads,marketing}',
+                    published: true
+                },
+                {
+                    title_en: 'Automation Roadmap for Clinics, Salons, and Service Offices',
+                    title_ar: 'خارطة طريق الأتمتة للعيادات، صالونات التجميل، ومكاتب الخدمات',
+                    excerpt_en: 'Instead of buying random tools, this article shows a simple 3-phase roadmap to introduce automation safely into your business.',
+                    excerpt_ar: 'بدل شراء أدوات عشوائية، يقدم هذا المقال خارطة طريق من ثلاث مراحل لإدخال الأتمتة إلى منشأتك بطريقة آمنة ومدروسة.',
+                    content_en: 'We break the journey into three phases:\n\n1. Understand and map your current workflows,\n2. Start with low-risk automations (reminders, notifications, reporting),\n3. Move to AI agents once the foundations are stable.\n\nFor each phase we provide concrete examples, recommended tools, and typical mistakes to avoid.',
+                    content_ar: 'نقسم رحلة الأتمتة إلى ثلاث مراحل واضحة:\n\n1. فهم ورسم العمليات الحالية داخل المنشأة،\n2. البدء بأتمتة منخفضة المخاطر مثل التذكيرات والإشعارات والتقارير،\n3. الانتقال إلى وكلاء الذكاء الاصطناعي بعد ثبات الأساسيات.\n\nفي كل مرحلة نوضح أمثلة عملية، أدوات مقترحة، وأخطاء شائعة يجب تجنبها.',
+                    slug: 'automation-roadmap-clinics-salons-service-offices',
+                    category: 'Business',
+                    author: 'NextAgent Team',
+                    image_url: '/images/blog/automation-roadmap.svg',
+                    tags: '{strategy,automation,roadmap}',
+                    published: true
+                }
+            ];
+
+        for (const post of finalBlogPosts) {
+            // Check if blog post exists by slug
+            const existing = await client.query(
+                'SELECT id FROM blog_posts WHERE slug = $1',
+                [post.slug]
+            );
+            
+            if (existing.rows.length > 0) {
+                // Update existing post
+                await client.query(
+                    `UPDATE blog_posts SET 
+                        title_ar = $1, title_en = $2, excerpt_ar = $3, excerpt_en = $4,
+                        content_ar = $5, content_en = $6, category = $7, author = $8,
+                        image_url = $9, tags = $10, published = $11, updated_at = CURRENT_TIMESTAMP
+                     WHERE slug = $12`,
+                    [post.title_ar, post.title_en, post.excerpt_ar, post.excerpt_en, post.content_ar, post.content_en,
+                     post.category, post.author, post.image_url, post.tags, post.published, post.slug]
+                );
+            } else {
+                // Insert new post
+                await client.query(
+                    `INSERT INTO blog_posts (title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, slug, category, author, image_url, tags, published) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+                    [post.title_ar, post.title_en, post.excerpt_ar, post.excerpt_en, post.content_ar, post.content_en,
+                     post.slug, post.category, post.author, post.image_url, post.tags, post.published]
+                );
+            }
+        }
+        console.log(`✅ Successfully updated ${blogPosts.length} blog posts`);
+
+    } catch (err) {
+        console.error('Error seeding database:', err);
+    } finally {
+        client.release();
+    }
+}
+
+// Manual seed endpoint (for testing/re-seeding)
+app.post('/api/admin/seed-database', async (req, res) => {
+    try {
+        await seedDatabase();
+        res.json({ success: true, message: 'Database seeded successfully' });
+    } catch (err) {
+        console.error('Error in seed endpoint:', err);
+        res.status(500).json({ error: 'Failed to seed database' });
+    }
+});
+
+// #endregion
+
+// --- Server Startup ---
+
+pool.connect()
+    .then(async client => {
+        console.log("Successfully connected to PostgreSQL!");
+        client.release();
+        
+        // Seed database with initial data if empty
+        await seedDatabase();
+        
+        const host = '0.0.0.0'; // Listen on all network interfaces
+        app.listen(port, host, () => {
+            console.log(`Backend server is now listening on all interfaces on port ${port}.`);
+            console.log(`Access the application via your domain (after reverse proxy setup): http://nextagents.msuliman.tech/index.html`);
+            console.log(`Or locally via: http://localhost:${port}/index.html`);
+        });
+    })
+    .catch(err => {
+        console.error("FATAL ERROR: Failed to connect to PostgreSQL.");
+        console.error("Please ensure your PostgreSQL server is running and the DATABASE_URL is correct.");
+        console.error("Connection Error:", err.message);
+        process.exit(1);
+    });
+

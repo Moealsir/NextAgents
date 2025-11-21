@@ -1,0 +1,787 @@
+/* ========================================
+   NextAgent.tech - Portfolio Page CSS
+   ======================================== */
+
+/* ============ Portfolio Hero ============ */
+.portfolio-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    padding: 120px 0 80px;
+    margin-top: 70px;
+    text-align: center;
+    color: white;
+}
+
+.portfolio-hero .hero-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.portfolio-hero .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+}
+
+/* ============ Stats Row ============ */
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+/* ============ Portfolio Content ============ */
+.portfolio-content {
+    padding: 80px 0;
+    background: var(--bg-light);
+}
+
+/* ============ Portfolio Filters ============ */
+.portfolio-filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.portfolio-filters .filter-btn {
+    padding: 12px 28px;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.portfolio-filters .filter-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.portfolio-filters .filter-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(252, 163, 17, 0.3);
+}
+
+/* ============ Portfolio Grid ============ */
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 35px;
+}
+
+/* ============ Case Card ============ */
+.case-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 30px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.case-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: var(--transition);
+}
+
+.case-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.case-card:hover::before {
+    transform: scaleX(1);
+}
+
+.case-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--primary-color), #e39410);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.case-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.case-client {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+/* ============ Case Details ============ */
+.case-details {
+    margin-bottom: 25px;
+}
+
+.case-point {
+    margin-bottom: 18px;
+    padding-left: 20px;
+    border-left: 3px solid #e9ecef;
+    padding-bottom: 15px;
+    line-height: 1.7;
+}
+
+[dir="rtl"] .case-point {
+    padding-left: 0;
+    padding-right: 20px;
+    border-left: none;
+    border-right: 3px solid #e9ecef;
+}
+
+.case-point strong {
+    display: block;
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+
+.case-point span {
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.case-point.highlight {
+    border-left-color: var(--primary-color);
+    background: linear-gradient(90deg, rgba(252, 163, 17, 0.05) 0%, transparent 100%);
+    padding: 15px 20px;
+    border-radius: 8px;
+}
+
+[dir="rtl"] .case-point.highlight {
+    border-left-color: transparent;
+    border-right-color: var(--primary-color);
+    background: linear-gradient(270deg, rgba(252, 163, 17, 0.05) 0%, transparent 100%);
+}
+
+.case-point.highlight strong {
+    color: var(--primary-color);
+}
+
+.case-point.highlight span {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* ============ Case Button ============ */
+.case-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--secondary-color), var(--tertiary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.case-btn::after {
+    content: '→';
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+[dir="rtl"] .case-btn::after {
+    content: '←';
+}
+
+.case-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 76, 119, 0.3);
+}
+
+.case-btn:hover::after {
+    transform: translateX(5px);
+}
+
+[dir="rtl"] .case-btn:hover::after {
+    transform: translateX(-5px);
+}
+
+/* ============ CTA Section ============ */
+.portfolio-cta {
+    background: linear-gradient(135deg, var(--tertiary-color) 0%, var(--secondary-color) 100%);
+    padding: 80px 0;
+    text-align: center;
+    color: white;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.cta-text {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    margin-bottom: 35px;
+    line-height: 1.8;
+}
+
+.btn-large {
+    padding: 18px 45px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* ============ Animations ============ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.case-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.case-card:nth-child(1) { animation-delay: 0.1s; }
+.case-card:nth-child(2) { animation-delay: 0.2s; }
+.case-card:nth-child(3) { animation-delay: 0.3s; }
+.case-card:nth-child(4) { animation-delay: 0.4s; }
+.case-card:nth-child(5) { animation-delay: 0.5s; }
+.case-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* ============ Filter Transition ============ */
+.case-card.hidden {
+    display: none;
+}
+
+/* ============ Portfolio Modal ============ */
+.case-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.case-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.4s ease-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: #999;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+[dir="rtl"] .modal-close {
+    right: auto;
+    left: 20px;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: var(--text-dark);
+}
+
+.modal-header {
+    padding: 40px 40px 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, var(--primary-color), #e39410);
+    color: white;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.modal-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    line-height: 1.4;
+    padding-right: 50px;
+}
+
+[dir="rtl"] .modal-title {
+    padding-right: 0;
+    padding-left: 50px;
+}
+
+.modal-client {
+    font-size: 1rem;
+    color: #666;
+    font-style: italic;
+}
+
+.modal-body {
+    padding: 30px 40px;
+}
+
+.modal-section {
+    margin-bottom: 30px;
+}
+
+.modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.modal-section h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 12px;
+}
+
+.modal-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.modal-section.highlight {
+    background: linear-gradient(135deg, rgba(252, 163, 17, 0.08) 0%, rgba(252, 163, 17, 0.02) 100%);
+    padding: 25px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+[dir="rtl"] .modal-section.highlight {
+    border-left: none;
+    border-right: 4px solid var(--primary-color);
+}
+
+.modal-section.highlight h3 {
+    color: var(--primary-color);
+}
+
+.modal-section.highlight p {
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.use-cases-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0 0;
+}
+
+.use-cases-list li {
+    padding: 10px 0 10px 30px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+[dir="rtl"] .use-cases-list li {
+    padding: 10px 30px 10px 0;
+}
+
+.use-cases-list li:last-child {
+    border-bottom: none;
+}
+
+.use-cases-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+[dir="rtl"] .use-cases-list li::before {
+    left: auto;
+    right: 0;
+}
+
+.modal-footer {
+    padding: 25px 40px 40px;
+    text-align: center;
+    border-top: 2px solid #f0f0f0;
+}
+
+.modal-footer .btn {
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* ============ Responsive Design ============ */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .portfolio-hero .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .stats-row {
+        gap: 40px;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+    }
+
+    .portfolio-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+
+    .cta-title {
+        font-size: 2rem;
+    }
+
+    .cta-text {
+        font-size: 1.1rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .portfolio-hero {
+        padding: 100px 0 60px;
+    }
+
+    .portfolio-hero .hero-title {
+        font-size: 2rem;
+    }
+
+    .portfolio-hero .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .stats-row {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+    }
+
+    .portfolio-content {
+        padding: 60px 0;
+    }
+
+    .portfolio-filters {
+        gap: 10px;
+    }
+
+    .portfolio-filters .filter-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+
+    .portfolio-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .case-card {
+        padding: 25px;
+    }
+
+    .case-title {
+        font-size: 1.2rem;
+    }
+
+    .case-client {
+        font-size: 0.9rem;
+    }
+
+    .case-point {
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+
+    [dir="rtl"] .case-point {
+        padding-right: 15px;
+        padding-left: 0;
+    }
+
+    .case-point.highlight {
+        padding: 12px 15px;
+    }
+
+    .portfolio-cta {
+        padding: 60px 0;
+    }
+
+    .cta-title {
+        font-size: 1.8rem;
+    }
+
+    .cta-text {
+        font-size: 1rem;
+    }
+
+    .btn-large {
+        padding: 16px 35px;
+        font-size: 1rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .portfolio-hero .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .portfolio-hero .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .portfolio-filters .filter-btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    .case-card {
+        padding: 20px;
+    }
+
+    .case-title {
+        font-size: 1.1rem;
+    }
+
+    .cta-title {
+        font-size: 1.5rem;
+    }
+
+    .btn-large {
+        padding: 14px 28px;
+        font-size: 0.95rem;
+    }
+}
+
+/* ============ Modal Responsive ============ */
+@media (max-width: 768px) {
+    .case-modal {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 40px);
+    }
+
+    .modal-header {
+        padding: 30px 25px 20px;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        padding-right: 45px;
+    }
+
+    [dir="rtl"] .modal-title {
+        padding-left: 45px;
+        padding-right: 0;
+    }
+
+    .modal-close {
+        top: 15px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+        font-size: 1.5rem;
+    }
+
+    [dir="rtl"] .modal-close {
+        left: 15px;
+        right: auto;
+    }
+
+    .modal-body {
+        padding: 20px 25px;
+    }
+
+    .modal-section {
+        margin-bottom: 25px;
+    }
+
+    .modal-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .modal-section p {
+        font-size: 0.95rem;
+    }
+
+    .modal-section.highlight {
+        padding: 20px;
+    }
+
+    .use-cases-list li {
+        padding: 8px 0 8px 25px;
+        font-size: 0.9rem;
+    }
+
+    [dir="rtl"] .use-cases-list li {
+        padding: 8px 25px 8px 0;
+    }
+
+    .modal-footer {
+        padding: 20px 25px 30px;
+    }
+
+    .modal-footer .btn {
+        padding: 14px 30px;
+        font-size: 1rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-header {
+        padding: 25px 20px 15px;
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+    }
+
+    .modal-body {
+        padding: 15px 20px;
+    }
+
+    .modal-section h3 {
+        font-size: 1rem;
+    }
+
+    .modal-footer {
+        padding: 15px 20px 25px;
+    }
+}

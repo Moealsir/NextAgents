@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="سابقة أعمال NextAgent.tech - مشاريع حقيقية نفذناها لعملائنا باستخدام الذكاء الاصطناعي والأتمتة">
+    <meta name="keywords" content="Portfolio, AI Projects, أعمالنا, مشاريع الذكاء الاصطناعي">
+    <title>أعمالنا - NextAgent.tech</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/portfolio.css">
+    <link rel="stylesheet" href="css/cookie-consent.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/0033769065001" class="whatsapp-btn" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Header -->
+    <header id="header">
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🤖</span>
+                    <span class="logo-text">NextAgent</span>
+                </a>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html#home" class="nav-link" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                    <li><a href="index.html#about" class="nav-link" data-ar="من نحن" data-en="About">من نحن</a></li>
+                    <li><a href="index.html#services" class="nav-link" data-ar="الخدمات" data-en="Services">الخدمات</a></li>
+                    <li><a href="portfolio.html" class="nav-link active" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</a></li>
+                    <li><a href="blog.html" class="nav-link" data-ar="المدونة" data-en="Blog">المدونة</a></li>
+                    <li><a href="booking.html" class="nav-link" data-ar="احجز استشارة" data-en="Book Consultation">احجز استشارة</a></li>
+                    <li><a href="index.html#contact" class="nav-link" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
+                </ul>
+
+                <div class="nav-actions">
+                    <button class="lang-toggle" id="langToggle" aria-label="Language Toggle">
+                        <span class="lang-text">EN</span>
+                    </button>
+                    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Portfolio Hero -->
+    <section class="portfolio-hero">
+        <div class="container">
+            <h1 class="hero-title" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</h1>
+            <p class="hero-subtitle" data-ar="مشاريع حقيقية نفذناها لعملائنا - نستخدم الأتمتة ووكلاء الذكاء الاصطناعي لتحسين المواعيد، خدمة العملاء، والمبيعات للمنشآت الصغيرة والمتوسطة" data-en="Real projects we delivered - We use AI agents and automation to improve bookings, customer service, and revenue for SMEs">
+                مشاريع حقيقية نفذناها لعملائنا - نستخدم الأتمتة ووكلاء الذكاء الاصطناعي لتحسين المواعيد، خدمة العملاء، والمبيعات للمنشآت الصغيرة والمتوسطة
+            </p>
+            
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="15+" data-en="15+">15+</div>
+                    <div class="stat-label" data-ar="مشروع مكتمل" data-en="Projects Delivered">مشروع مكتمل</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="250%" data-en="250%">250%</div>
+                    <div class="stat-label" data-ar="متوسط زيادة الحجوزات" data-en="Avg. Booking Increase">متوسط زيادة الحجوزات</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="65%" data-en="65%">65%</div>
+                    <div class="stat-label" data-ar="تقليل الوقت التشغيلي" data-en="Time Saved">تقليل الوقت التشغيلي</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Content -->
+    <section class="portfolio-content">
+        <div class="container">
+            <!-- Filter Bar -->
+            <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all" data-ar="الكل" data-en="All">الكل</button>
+                <button class="filter-btn" data-filter="ecommerce" data-ar="التجارة الإلكترونية" data-en="E-Commerce">التجارة الإلكترونية</button>
+                <button class="filter-btn" data-filter="medical" data-ar="العيادات الطبية" data-en="Medical Clinics">العيادات الطبية</button>
+                <button class="filter-btn" data-filter="beauty" data-ar="صالونات التجميل" data-en="Beauty Salons">صالونات التجميل</button>
+                <button class="filter-btn" data-filter="marketing" data-ar="وكالات التسويق" data-en="Marketing Agencies">وكالات التسويق</button>
+                <button class="filter-btn" data-filter="automation" data-ar="أتمتة الأعمال" data-en="Business Automation">أتمتة الأعمال</button>
+            </div>
+
+            <!-- Portfolio Grid -->
+            <!-- Cards are dynamically rendered by portfolio.js from real Upwork projects -->
+            <div class="portfolio-grid" id="portfolioGrid">
+                <div class="loading" data-ar="جاري تحميل المشاريع..." data-en="Loading projects...">جاري تحميل المشاريع...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="portfolio-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-ar="عندك نفس التحديات في منشأتك؟" data-en="Facing Similar Challenges in Your Business?">عندك نفس التحديات في منشأتك؟</h2>
+                <p class="cta-text" data-ar="دعنا نساعدك على تحويل عملك بحلول الذكاء الاصطناعي والأتمتة المتقدمة" data-en="Let us help you transform your business with AI and advanced automation solutions">دعنا نساعدك على تحويل عملك بحلول الذكاء الاصطناعي والأتمتة المتقدمة</p>
+                <a href="booking.html" class="btn btn-primary btn-large" data-ar="احجز استشارة مجانية الآن" data-en="Book Your Free Consultation Now">احجز استشارة مجانية الآن</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🤖</span>
+                        <span class="logo-text">NextAgent</span>
+                    </a>
+                    <p data-ar="وكلاء الذكاء الاصطناعي والأتمتة للشركات الصغيرة والمتوسطة" 
+                       data-en="AI Agents and Automation for Small and Medium Businesses">
+                        وكلاء الذكاء الاصطناعي والأتمتة للشركات الصغيرة والمتوسطة
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                        <li><a href="index.html#about" data-ar="من نحن" data-en="About">من نحن</a></li>
+                        <li><a href="portfolio.html" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</a></li>
+                        <li><a href="faq.html" data-ar="الأسئلة الشائعة" data-en="FAQ">الأسئلة الشائعة</a></li>
+                        <li><a href="booking.html" data-ar="احجز استشارة" data-en="Book">احجز استشارة</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="تواصل معنا" data-en="Contact">تواصل معنا</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +33 7 69 06 50 01</li>
+                        <li><i class="fas fa-envelope"></i> salse@nextagent.tech</li>
+                        <li><i class="fas fa-map-marker-alt"></i> <span data-ar="باريس - فرنسا" data-en="Paris - France">باريس - فرنسا</span></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="تابعنا" data-en="Follow Us">تابعنا</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 NextAgent.tech. <span data-ar="جميع الحقوق محفوظة" data-en="All rights reserved">جميع الحقوق محفوظة</span>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/portfolio.js"></script>
+    <script src="js/cookie-consent.js"></script>
+</body>
+</html>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/portfolio.css">
+    <link rel="stylesheet" href="css/cookie-consent.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/0033769065001" class="whatsapp-btn" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Header -->
+    <header id="header">
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🤖</span>
+                    <span class="logo-text">NextAgent</span>
+                </a>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html#home" class="nav-link" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                    <li><a href="index.html#about" class="nav-link" data-ar="من نحن" data-en="About">من نحن</a></li>
+                    <li><a href="index.html#services" class="nav-link" data-ar="الخدمات" data-en="Services">الخدمات</a></li>
+                    <li><a href="portfolio.html" class="nav-link active" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</a></li>
+                    <li><a href="blog.html" class="nav-link" data-ar="المدونة" data-en="Blog">المدونة</a></li>
+                    <li><a href="booking.html" class="nav-link" data-ar="احجز استشارة" data-en="Book Consultation">احجز استشارة</a></li>
+                    <li><a href="index.html#contact" class="nav-link" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
+                </ul>
+
+                <div class="nav-actions">
+                    <button class="lang-toggle" id="langToggle" aria-label="Language Toggle">
+                        <span class="lang-text">EN</span>
+                    </button>
+                    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Portfolio Hero -->
+    <section class="portfolio-hero">
+        <div class="container">
+            <h1 class="hero-title" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</h1>
+            <p class="hero-subtitle" data-ar="مشاريع حقيقية نفذناها لعملائنا - نستخدم الأتمتة ووكلاء الذكاء الاصطناعي لتحسين المواعيد، خدمة العملاء، والمبيعات للمنشآت الصغيرة والمتوسطة" data-en="Real projects we delivered - We use AI agents and automation to improve bookings, customer service, and revenue for SMEs">
+                مشاريع حقيقية نفذناها لعملائنا - نستخدم الأتمتة ووكلاء الذكاء الاصطناعي لتحسين المواعيد، خدمة العملاء، والمبيعات للمنشآت الصغيرة والمتوسطة
+            </p>
+            
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="15+" data-en="15+">15+</div>
+                    <div class="stat-label" data-ar="مشروع مكتمل" data-en="Projects Delivered">مشروع مكتمل</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="250%" data-en="250%">250%</div>
+                    <div class="stat-label" data-ar="متوسط زيادة الحجوزات" data-en="Avg. Booking Increase">متوسط زيادة الحجوزات</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-ar="65%" data-en="65%">65%</div>
+                    <div class="stat-label" data-ar="تقليل الوقت التشغيلي" data-en="Time Saved">تقليل الوقت التشغيلي</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Content -->
+    <section class="portfolio-content">
+        <div class="container">
+            <!-- Filter Bar -->
+            <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all" data-ar="الكل" data-en="All">الكل</button>
+                <button class="filter-btn" data-filter="ecommerce" data-ar="التجارة الإلكترونية" data-en="E-Commerce">التجارة الإلكترونية</button>
+                <button class="filter-btn" data-filter="medical" data-ar="العيادات الطبية" data-en="Medical Clinics">العيادات الطبية</button>
+                <button class="filter-btn" data-filter="beauty" data-ar="صالونات التجميل" data-en="Beauty Salons">صالونات التجميل</button>
+                <button class="filter-btn" data-filter="marketing" data-ar="وكالات التسويق" data-en="Marketing Agencies">وكالات التسويق</button>
+                <button class="filter-btn" data-filter="automation" data-ar="أتمتة الأعمال" data-en="Business Automation">أتمتة الأعمال</button>
+            </div>
+
+            <!-- Portfolio Grid -->
+            <!-- Cards are dynamically rendered by portfolio.js from real Upwork projects -->
+            <div class="portfolio-grid" id="portfolioGrid">
+                <div class="loading" data-ar="جاري تحميل المشاريع..." data-en="Loading projects...">جاري تحميل المشاريع...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="portfolio-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-ar="عندك نفس التحديات في منشأتك؟" data-en="Facing Similar Challenges in Your Business?">عندك نفس التحديات في منشأتك؟</h2>
+                <p class="cta-text" data-ar="دعنا نساعدك على تحويل عملك بحلول الذكاء الاصطناعي والأتمتة المتقدمة" data-en="Let us help you transform your business with AI and advanced automation solutions">دعنا نساعدك على تحويل عملك بحلول الذكاء الاصطناعي والأتمتة المتقدمة</p>
+                <a href="booking.html" class="btn btn-primary btn-large" data-ar="احجز استشارة مجانية الآن" data-en="Book Your Free Consultation Now">احجز استشارة مجانية الآن</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🤖</span>
+                        <span class="logo-text">NextAgent</span>
+                    </a>
+                    <p data-ar="وكلاء الذكاء الاصطناعي والأتمتة للشركات الصغيرة والمتوسطة" 
+                       data-en="AI Agents and Automation for Small and Medium Businesses">
+                        وكلاء الذكاء الاصطناعي والأتمتة للشركات الصغيرة والمتوسطة
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                        <li><a href="index.html#about" data-ar="من نحن" data-en="About">من نحن</a></li>
+                        <li><a href="portfolio.html" data-ar="أعمالنا" data-en="Portfolio">أعمالنا</a></li>
+                        <li><a href="blog.html" data-ar="المدونة" data-en="Blog">المدونة</a></li>
+                        <li><a href="booking.html" data-ar="احجز استشارة" data-en="Book">احجز استشارة</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="تواصل معنا" data-en="Contact">تواصل معنا</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +33 7 69 06 50 01</li>
+                        <li><i class="fas fa-envelope"></i> salse@nextagent.tech</li>
+                        <li><i class="fas fa-map-marker-alt"></i> <span data-ar="باريس - فرنسا" data-en="Paris - France">باريس - فرنسا</span></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-ar="تابعنا" data-en="Follow Us">تابعنا</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>وcopy; 2025 NextAgent.tech. <span data-ar="جميع الحقوق محفوظة" data-en="All rights reserved">جميع الحقوق محفوظة</span>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/portfolio.js"></script>
+    <script src="js/cookie-consent.js"></script>
+</body>
+</html>

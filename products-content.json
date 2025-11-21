@@ -1,0 +1,74 @@
+{
+  "products": [
+    {
+      "title_en": "Beginner's Guide to Automation",
+      "title_ar": "دليل المبتدئين للأتمتة",
+      "description_en": "A complete step-by-step beginner guide that introduces SMEs to automation. It explains the most common workflows, the tools used, the costs, and a practical roadmap to automate the first 2-3 processes inside any business without disrupting operations.",
+      "description_ar": "دليل مبتدئين كامل خطوة بخطوة يقدم الأتمتة للمنشآت الصغيرة والمتوسطة. يشرح مسارات العمل الأكثر شيوعًا، الأدوات المستخدمة، التكاليف، وخارطة طريق عملية لأتمتة أول 2-3 عمليات داخل أي منشأة دون تعطيل العمليات.",
+      "who_is_this_for_en": "Small business owners, clinic managers, salon owners, and service offices starting automation for the first time.",
+      "who_is_this_for_ar": "أصحاب الأعمال الصغيرة، مديري العيادات، أصحاب الصالونات، ومكاتب الخدمات الذين يبدأون الأتمتة لأول مرة.",
+      "value_en": "Saves 10-20 hours of research and gives a clean roadmap to start automation.",
+      "value_ar": "يوفر 10-20 ساعة من البحث ويقدم خارطة طريق واضحة لبدء الأتمتة.",
+      "icon": "fas fa-robot",
+      "file_type": "PDF",
+      "file_size": "2.5 MB",
+      "download_url": "/downloads/automation-starter-guide.pdf"
+    },
+    {
+      "title_en": "AI Beginner Guide",
+      "title_ar": "دليل المبتدئين للذكاء الاصطناعي",
+      "description_en": "A visual, beginner-friendly explainer covering the basics of AI, what AI agents are, and how they differ from chatbots. Includes case studies from clinics, salons, and service businesses.",
+      "description_ar": "شرح مرئي ومناسب للمبتدئين يغطي أساسيات الذكاء الاصطناعي، ما هي عوامل الذكاء الاصطناعي، وكيف تختلف عن روبوتات الدردشة. يتضمن دراسات حالة من العيادات والصالونات والشركات الخدمية.",
+      "who_is_this_for_en": "Complete beginners who want to understand AI without technical jargon or coding knowledge.",
+      "who_is_this_for_ar": "المبتدئين الكاملين الذين يريدون فهم الذكاء الاصطناعي دون مصطلحات تقنية أو معرفة برمجية.",
+      "value_en": "Clarifies what AI can and cannot do, helping businesses make realistic automation decisions.",
+      "value_ar": "يوضح ما يمكن وما لا يمكن للذكاء الاصطناعي فعله، مما يساعد الشركات على اتخاذ قرارات أتمتة واقعية.",
+      "icon": "fas fa-brain",
+      "file_type": "PDF",
+      "file_size": "1.8 MB",
+      "download_url": "/downloads/ai-beginner-guide.pdf"
+    },
+    {
+      "title_en": "Chatbot Response Templates (JSON)",
+      "title_ar": "قوالب ردود الشات بوت (JSON)",
+      "description_en": "A collection of pre-written, natural-sounding chatbot responses for clinics, salons, and service businesses. Includes appointment booking, product inquiries, cancellations, and FAQs. Ready to copy-paste into any chatbot platform.",
+      "description_ar": "مجموعة من ردود الشات بوت الجاهزة والطبيعية للعيادات والصالونات والشركات الخدمية. تتضمن حجز المواعيد، الاستفسارات عن المنتجات، الإلغاءات، والأسئلة الشائعة. جاهزة للنسخ واللصق في أي منصة شات بوت.",
+      "who_is_this_for_en": "Business owners or support staff setting up their first chatbot or AI agent and unsure what to write.",
+      "who_is_this_for_ar": "أصحاب الأعمال أو موظفي الدعم الذين يقومون بإعداد أول شات بوت أو عامل ذكاء اصطناعي ولا يعرفون ماذا يكتبون.",
+      "value_en": "Saves hours of writing and testing responses, ensuring professional tone and coverage of common scenarios.",
+      "value_ar": "يوفر ساعات من الكتابة واختبار الردود، مما يضمن نبرة احترافية وتغطية السيناريوهات الشائعة.",
+      "icon": "fas fa-comments",
+      "file_type": "JSON",
+      "file_size": "450 KB",
+      "download_url": "/downloads/chatbot-response-templates.json"
+    },
+    {
+      "title_en": "Advanced Automation Settings (JSON)",
+      "title_ar": "إعدادات الأتمتة المتقدمة (JSON)",
+      "description_en": "A technical configuration file for businesses already using automation tools like n8n, Make, or Zapier. Includes webhook URLs, API keys structure, conditional logic templates, and error-handling flows.",
+      "description_ar": "ملف تكوين تقني للشركات التي تستخدم بالفعل أدوات الأتمتة مثل n8n أو Make أو Zapier. يتضمن عناوين URL الخاصة بالـ webhook، بنية مفاتيح API، قوالب المنطق الشرطي، وتدفقات معالجة الأخطاء.",
+      "who_is_this_for_en": "Intermediate users or agencies who want to scale automation and need pre-configured structures for complex workflows.",
+      "who_is_this_for_ar": "المستخدمين المتوسطين أو الوكالات الذين يريدون توسيع نطاق الأتمتة ويحتاجون إلى هياكل مسبقة التكوين لمسارات عمل معقدة.",
+      "value_en": "Speeds up advanced workflow setup by 50% and reduces trial-and-error in configuring API connections.",
+      "value_ar": "يسرع إعداد مسارات العمل المتقدمة بنسبة 50% ويقلل من التجربة والخطأ في تكوين اتصالات API.",
+      "icon": "fas fa-cogs",
+      "file_type": "JSON",
+      "file_size": "320 KB",
+      "download_url": "/downloads/advanced-automation-settings.json"
+    },
+    {
+      "title_en": "AI Business Plan Template",
+      "title_ar": "قالب خطة عمل الذكاء الاصطناعي",
+      "description_en": "A structured template that shows how to plan an AI-powered project for your business, how to pitch it to investors or management, and how to calculate expected ROI from automation projects. Includes real examples from clinics and service businesses.",
+      "description_ar": "قالب منظم يوضح كيفية تخطيط مشروع مدعوم بالذكاء الاصطناعي لشركتك، كيفية تقديمه للمستثمرين أو الإدارة، وكيفية حساب العائد على الاستثمار المتوقع من مشاريع الأتمتة. يتضمن أمثلة حقيقية من العيادات والشركات الخدمية.",
+      "who_is_this_for_en": "Entrepreneurs or business managers who want to secure budget approval, build internal support, or pitch AI projects to leadership or investors.",
+      "who_is_this_for_ar": "رواد الأعمال أو مديري الأعمال الذين يريدون تأمين موافقة الميزانية، بناء الدعم الداخلي، أو تقديم مشاريع الذكاء الاصطناعي للقيادة أو المستثمرين.",
+      "value_en": "Eliminates guesswork and gives a professional pitch structure to secure buy-in and funding for AI projects.",
+      "value_ar": "يزيل التخمينات ويوفر هيكل عرض احترافي لتأمين الدعم والتمويل لمشاريع الذكاء الاصطناعي.",
+      "icon": "fas fa-lightbulb",
+      "file_type": "DOCX",
+      "file_size": "600 KB",
+      "download_url": "/downloads/ai-business-plan-template.docx"
+    }
+  ]
+}

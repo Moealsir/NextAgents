@@ -1,0 +1,65 @@
+{
+  "languages": ["en", "ar"],
+  "categories": {
+    "greeting": {
+      "en": [
+        "Hello! How can I help you today?",
+        "Welcome! Let me know what you need and I'll guide you.",
+        "Hi! Do you want to book an appointment, ask a question, or talk to a human agent?"
+      ],
+      "ar": [
+        "مرحباً! كيف أقدر أساعدك اليوم؟",
+        "أهلاً وسهلاً! أخبرني بما تحتاج وسأرشدك خطوة بخطوة.",
+        "مرحباً! هل ترغب في حجز موعد، طرح سؤال، أم التحدث مع موظف؟"
+      ]
+    },
+    "booking": {
+      "en": [
+        "To book an appointment, please share your preferred date, time, and service.",
+        "I can help you with booking. Which day suits you best and for which service?",
+        "Please choose morning, afternoon, or evening, and I will show you the available slots."
+      ],
+      "ar": [
+        "لحجز موعد، يرجى تزويدي بالتاريخ والوقت ونوع الخدمة المطلوبة.",
+        "أستطيع مساعدتك في الحجز، ما اليوم والوقت المناسبان لك؟",
+        "اختر الفترة المناسبة (صباحاً، ظهراً، مساءً) وسأعرض لك المواعيد المتاحة."
+      ]
+    },
+    "follow_up": {
+      "en": [
+        "Just checking in to see if you are still interested in confirming your appointment.",
+        "We noticed you asked about our services earlier. Would you like to complete your booking now?",
+        "If you have any questions before booking, feel free to ask me here."
+      ],
+      "ar": [
+        "أحببت فقط التأكد إذا كنت ما زلت مهتماً بتأكيد حجزك.",
+        "لاحظنا أنك استفسرت عن خدماتنا سابقاً، هل تحب نكمل إجراءات الحجز الآن؟",
+        "إذا كان لديك أي استفسار قبل إتمام الحجز، لا تتردد في سؤالي هنا."
+      ]
+    },
+    "no_show_recovery": {
+      "en": [
+        "We noticed you couldn't make it to your last appointment. Would you like to reschedule?",
+        "Your time is important to us. We can help you find a new slot that fits your schedule.",
+        "We're sorry we missed you last time. Would you like me to propose two alternative dates?"
+      ],
+      "ar": [
+        "لاحظنا أنك لم تتمكن من الحضور في موعدك السابق، هل تود إعادة جدولة الموعد؟",
+        "وقتك يهمنا، بإمكاني مساعدتك في اختيار موعد جديد يناسب جدولك.",
+        "نأسف لعدم لقائك في الموعد السابق، هل ترغب أن أقترح لك موعدَين بديلين؟"
+      ]
+    },
+    "handoff": {
+      "en": [
+        "I will transfer you to a human assistant now. Please wait a moment.",
+        "This case needs a specialist. I'm connecting you to the team.",
+        "I've sent your details to our staff. Someone will join the chat shortly."
+      ],
+      "ar": [
+        "سأقوم الآن بتحويلك إلى موظف لخدمتك بشكل أفضل، يرجى الانتظار قليلاً.",
+        "هذه الحالة تحتاج إلى مختص، سأقوم بربطك بالفريق الآن.",
+        "تم إرسال تفاصيلك إلى فريق العمل، سينضم أحدهم للمحادثة خلال لحظات."
+      ]
+    }
+  }
+}

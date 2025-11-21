@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "description": "Advanced automation rules and workflow settings for SMEs (clinics, salons, service offices).",
+  "triggers": [
+    {
+      "id": "lead_new_whatsapp",
+      "event": "incoming_message",
+      "channel": "whatsapp",
+      "condition": "first_contact == true",
+      "actions": [
+        "create_lead_record",
+        "send_welcome_sequence"
+      ]
+    },
+    {
+      "id": "appointment_24h_reminder",
+      "event": "scheduled_job",
+      "schedule": "every_hour",
+      "condition": "appointments_in_next_24h > 0",
+      "actions": [
+        "send_whatsapp_reminder",
+        "log_reminder_activity"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "no_show_flag",
+      "description_en": "If a patient/client misses 2 confirmed appointments in 60 days, mark them as high no-show risk.",
+      "description_ar": "إذا تغيّب العميل عن موعدين مؤكدين خلال ٦٠ يوماً، يتم اعتباره عالي الاحتمال لعدم الحضور.",
+      "logic": "if no_show_count_60d >= 2 then set_tag('high_no_show_risk')"
+    },
+    {
+      "id": "vip_followup",
+      "description_en": "For VIP clients, always send a follow-up message within 24 hours after the visit.",
+      "description_ar": "بالنسبة للعملاء المميزين (VIP)، يتم إرسال رسالة متابعة خلال ٢٤ ساعة من الزيارة.",
+      "logic": "if client_segment == 'VIP' then enqueue_followup('24h')"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Lead Intake and Qualification",
+      "steps": [
+        "Receive lead from form or WhatsApp",
+        "Check if lead exists in CRM",
+        "If new, create lead and assign owner",
+        "Send intro message with options",
+        "If no answer in 1 hour, send gentle follow-up"
+      ]
+    },
+    {
+      "name": "Post-Visit Feedback Loop",
+      "steps": [
+        "24 hours after completed appointment, send feedback form link",
+        "If rating <= 3, alert manager",
+        "If rating >= 4, ask for public review link",
+        "Log feedback in analytics sheet"
+      ]
+    }
+  ]
+}

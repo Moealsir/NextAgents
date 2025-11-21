@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(currentLang);
 
     // Load dynamic content
-    loadProducts();
+    // loadProducts(); // Disabled - Coming Soon
     loadTestimonials();
 
     // Setup event listeners
@@ -42,12 +42,16 @@ function applyLanguage(lang) {
         html.setAttribute('lang', 'ar');
         html.setAttribute('dir', 'rtl');
         body.setAttribute('dir', 'rtl');
-        langToggle.querySelector('.lang-text').textContent = 'EN';
+        if (langToggle) {
+            langToggle.querySelector('.lang-text').textContent = 'EN';
+        }
     } else {
         html.setAttribute('lang', 'en');
         html.setAttribute('dir', 'ltr');
         body.setAttribute('dir', 'ltr');
-        langToggle.querySelector('.lang-text').textContent = 'AR';
+        if (langToggle) {
+            langToggle.querySelector('.lang-text').textContent = 'AR';
+        }
     }
 
     // Update all translatable elements
@@ -55,6 +59,9 @@ function applyLanguage(lang) {
     
     // Save preference
     localStorage.setItem('language', lang);
+    
+    // Dispatch event for other scripts (like portfolio.js)
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
 }
 
 function updateTranslations() {
@@ -303,25 +310,31 @@ function createMessageDiv(form) {
 // ============ Event Listeners Setup ============
 function setupEventListeners() {
     // Language toggle
-    langToggle.addEventListener('click', () => {
-        const newLang = currentLang === 'ar' ? 'en' : 'ar';
-        applyLanguage(newLang);
-    });
+    if (langToggle) {
+        langToggle.addEventListener('click', () => {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            applyLanguage(newLang);
+        });
+    }
 
     // Mobile menu toggle
-    mobileToggle.addEventListener('click', () => {
-        mobileToggle.classList.toggle('active');
-        navMenu.classList.toggle('active');
-    });
+    if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', () => {
+            mobileToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    }
 
     // Close mobile menu when clicking on a link
-    const navLinks = navMenu.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileToggle.classList.remove('active');
-            navMenu.classList.remove('active');
+    if (navMenu && mobileToggle) {
+        const navLinks = navMenu.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
         });
-    });
+    }
 
     // Form submissions
     if (surveyForm) {

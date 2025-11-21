@@ -1,0 +1,16 @@
+{
+  "name": "n8n Workflow Pack for Service Businesses",
+  "nodes": [],
+  "connections": {},
+  "meta": {
+    "templateCreatedBy": "NextAgent Team",
+    "description": "Placeholder file - Full n8n workflow pack coming soon",
+    "workflows_included": [
+      "Appointment reminder system",
+      "Lead capture and CRM sync",
+      "Email notification workflows",
+      "WhatsApp automation templates",
+      "Booking confirmation flows"
+    ]
+  }
+}
