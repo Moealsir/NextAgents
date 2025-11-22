@@ -330,8 +330,11 @@ function setupEventListeners() {
         const navLinks = navMenu.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                mobileToggle.classList.remove('active');
-                navMenu.classList.remove('active');
+                // Only close menu for hash links (internal navigation)
+                if (link.getAttribute('href').startsWith('#')) {
+                    mobileToggle.classList.remove('active');
+                    navMenu.classList.remove('active');
+                }
             });
         });
     }
