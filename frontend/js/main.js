@@ -422,6 +422,14 @@ function debounce(func, wait) {
     };
 }
 
+// Load footer.html into the page
+fetch("footer.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("footer").innerHTML = data;
+    });
+
+
 // ============ Console Welcome Message ============
 console.log('%c🤖 NextAgent.tech', 'font-size: 24px; font-weight: bold; color: #fca311;');
 console.log('%cWelcome to NextAgent.tech - AI Agents & Automation Platform', 'font-size: 14px; color: #274c77;');
