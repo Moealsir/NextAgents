@@ -299,7 +299,7 @@ pool.connect()
         const host = '0.0.0.0'; // Listen on all network interfaces
         app.listen(port, host, () => {
             console.log(`Backend server is now listening on all interfaces on port ${port}.`);
-            console.log(`Access the application via your domain (after reverse proxy setup): http://nextagents.msuliman.tech/index.html`);
+            console.log(`Access the application via your domain (after reverse proxy setup): http://nextagents.me/index.html`);
             console.log(`Or locally via: http://localhost:${port}/index.html`);
         });
     })

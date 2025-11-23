@@ -429,6 +429,13 @@ fetch("footer.html")
         document.getElementById("footer").innerHTML = data;
     });
 
+// Load header.html into the page
+fetch("header.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("header").innerHTML = data;
+    });
+
 
 // ============ Console Welcome Message ============
 console.log('%c🤖 NextAgent.tech', 'font-size: 24px; font-weight: bold; color: #fca311;');

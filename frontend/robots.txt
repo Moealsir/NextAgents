@@ -1,11 +1,11 @@
-# NextAgent.tech - Robots.txt
+# nextagents.me - Robots.txt
 # =================================
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://nextagent.tech/sitemap.xml
+Sitemap: https://nextagents.me/sitemap.xml
 
 # Disallow admin areas
 Disallow: /admin.html
