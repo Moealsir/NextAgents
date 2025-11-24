@@ -429,12 +429,40 @@ fetch("footer.html")
         document.getElementById("footer").innerHTML = data;
     });
 
+
+
 // Load header.html into the page
 fetch("header.html")
     .then(response => response.text())
     .then(data => {
         document.getElementById("header").innerHTML = data;
+
+        // Now header exists — setup menu listeners
+        initializeMobileMenu();
     });
+
+function initializeMobileMenu() {
+    const mobileToggle = document.getElementById("mobileToggle");
+    const navMenu = document.getElementById("navMenu");
+
+    if (!mobileToggle || !navMenu) {
+        console.warn("Mobile menu elements not found.");
+        return;
+    }
+
+    mobileToggle.addEventListener("click", () => {
+        mobileToggle.classList.toggle("active");
+        navMenu.classList.toggle("active");
+    });
+
+    // Close menu when clicking a link
+    navMenu.querySelectorAll(".nav-link").forEach(link => {
+        link.addEventListener("click", () => {
+            mobileToggle.classList.remove("active");
+            navMenu.classList.remove("active");
+        });
+    });
+}
 
 
 // ============ Console Welcome Message ============
